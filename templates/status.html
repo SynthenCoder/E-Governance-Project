@@ -1,0 +1,19 @@
+<h2>Your Applications 📄</h2>
+
+<table border="1">
+  <tr>
+    <th>ID</th>
+    <th>Username</th>
+    <th>Full Name</th>
+    <th>Status</th>
+  </tr>
+
+  {% for app in applications %}
+  <tr>
+    <td>{{ app[0] }}</td>
+    <td>{{ app[1] }}</td>
+    <td>{{ app[2] }}</td>
+    <td>{{ app[3] }}</td>
+  </tr>
+  {% endfor %}
+</table>
