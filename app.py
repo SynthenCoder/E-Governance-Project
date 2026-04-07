@@ -1,7 +1,7 @@
 import os
 import uuid
 import smtplib
-import random  # ✅ NEW
+import random
 from email.mime.text import MIMEText
 from flask import Flask, render_template, request, redirect, session, flash, send_from_directory
 import sqlite3
@@ -69,6 +69,38 @@ def get_db():
     conn = sqlite3.connect("database.db")
     conn.row_factory = sqlite3.Row
     return conn
+
+# =========================
+# 🔥 DB INIT FIX (NEW)
+# =========================
+def init_db():
+    conn = sqlite3.connect("database.db")
+
+    conn.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE,
+        email TEXT UNIQUE,
+        password TEXT,
+        role TEXT
+    )
+    """)
+
+    conn.execute("""
+    CREATE TABLE IF NOT EXISTS applications (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT,
+        full_name TEXT,
+        file TEXT,
+        status TEXT
+    )
+    """)
+
+    conn.commit()
+    conn.close()
+
+# 🔥 CALL INIT (IMPORTANT)
+init_db()
 
 
 # =========================
@@ -494,7 +526,7 @@ def approve(id):
         )
 
     flash("Approved ✅")
-    return redirect("/admin", code=303)  # ✅ FIXED
+    return redirect("/admin", code=303)
 
 
 # =========================
@@ -538,7 +570,7 @@ def reject(id):
         )
 
     flash("Rejected ❌")
-    return redirect("/admin", code=303)  # ✅ FIXED
+    return redirect("/admin", code=303)
 
 
 # =========================
