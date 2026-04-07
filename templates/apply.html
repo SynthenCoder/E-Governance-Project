@@ -1,7 +1,118 @@
-<h2>Apply for Citizenship 🇳🇵</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Application · Nepal E-Governance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
 
-<form method="POST">
-  <input type="text" name="username" placeholder="Your username"><br><br>
-  <input type="text" name="full_name" placeholder="Full Name"><br><br>
-  <button type="submit">Submit Application</button>
-</form>
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <span class="sidebar-brand-icon">🇳🇵</span>
+            <div>
+                <div class="sidebar-brand-text">E-Governance</div>
+                <div class="sidebar-brand-sub">Nepal Portal</div>
+            </div>
+        </div>
+
+        <span class="sidebar-label">Main</span>
+        <a href="/" class="sidebar-link">
+            <span class="sidebar-link-icon">⌂</span> Home
+        </a>
+        <a href="/dashboard" class="sidebar-link">
+            <span class="sidebar-link-icon">▦</span> Dashboard
+        </a>
+
+        <span class="sidebar-label">Services</span>
+        <a href="/apply" class="sidebar-link active">
+            <span class="sidebar-link-icon">✎</span> Apply
+        </a>
+        <a href="/status" class="sidebar-link">
+            <span class="sidebar-link-icon">◎</span> My Applications
+        </a>
+
+        {% if session.get('role') == 'admin' %}
+        <span class="sidebar-label">Admin</span>
+        <a href="/admin" class="sidebar-link">
+            <span class="sidebar-link-icon">⚙</span> Admin Panel
+        </a>
+        {% endif %}
+
+        <div class="sidebar-spacer"></div>
+        <a href="/logout" class="sidebar-link danger">
+            <span class="sidebar-link-icon">→</span> Logout
+        </a>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <div class="page-header animate-in">
+            <p class="page-eyebrow">Services</p>
+            <h1 class="page-title">📄 Submit Application</h1>
+            <p class="page-subtitle">Complete the form below to submit your government service request</p>
+        </div>
+
+        <div class="card animate-in" style="max-width:520px;animation-delay:.08s;">
+
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div style="background:var(--green-muted);border:0.5px solid rgba(22,163,74,.25);border-radius:var(--radius-sm);padding:10px 14px;font-size:.82rem;color:var(--green-text);margin-bottom:20px;">
+                {{ messages[0] }}
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            <form method="POST" enctype="multipart/form-data">
+
+                <!-- FULL NAME -->
+                <div class="form-group">
+                    <label class="form-label">Full Name *</label>
+                    <input class="form-input" type="text" name="full_name" autocomplete="name" placeholder="Enter your full legal name" required>
+                </div>
+
+                <!-- FILE -->
+                <div class="form-group">
+                    <label class="form-label">Upload Citizenship (PDF only)</label>
+
+                    <input 
+                        class="form-input" 
+                        type="file" 
+                        name="file" 
+                        accept="application/pdf"
+                        required
+                    >
+
+                    <small style="color:var(--text-mid); font-size:0.75rem;">
+                        Only government-issued citizenship documents in PDF format are accepted (max 5MB).
+                    </small>
+                </div>
+
+                <div class="divider"></div>
+
+                <p style="font-size:.78rem;color:var(--text-low);margin-bottom:12px;line-height:1.6;">
+                    By submitting this application, you confirm that all provided information is accurate and truthful.
+                </p>
+
+                <p style="font-size:.75rem;color:var(--red-text);margin-bottom:16px;">
+                    Submitting false or forged documents may result in legal action under Nepal law.
+                </p>
+
+                <div class="flex gap-3">
+                    <button type="submit" class="btn btn-primary btn-lg">Submit Application</button>
+                    <a href="/dashboard" class="btn btn-ghost btn-lg">Cancel</a>
+                </div>
+
+            </form>
+        </div>
+
+    </main>
+</div>
+
+</body>
+</html>

@@ -1,3 +1,134 @@
-<a href="/apply">Apply for Citizenship</a><br><br>
-<a href="/status">View Application Status</a><a href="/apply">Apply for Citizenship</a><br><br>
-<a href="/status">View Application Status</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard · Nepal E-Governance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <span class="sidebar-brand-icon">🇳🇵</span>
+            <div>
+                <div class="sidebar-brand-text">E-Governance</div>
+                <div class="sidebar-brand-sub">Nepal Portal</div>
+            </div>
+        </div>
+
+        <span class="sidebar-label">Main</span>
+        <a href="/" class="sidebar-link">
+            <span class="sidebar-link-icon">⌂</span> Home
+        </a>
+        <a href="/dashboard" class="sidebar-link active">
+            <span class="sidebar-link-icon">▦</span> Dashboard
+        </a>
+
+        <span class="sidebar-label">Services</span>
+        <a href="/apply" class="sidebar-link">
+            <span class="sidebar-link-icon">✎</span> Apply
+        </a>
+        <a href="/status" class="sidebar-link">
+            <span class="sidebar-link-icon">◎</span> My Applications
+        </a>
+
+        <div class="sidebar-spacer"></div>
+        <a href="/logout" class="sidebar-link danger">
+            <span class="sidebar-link-icon">→</span> Logout
+        </a>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <!-- HEADER -->
+        <div class="page-header animate-in">
+            <p class="page-eyebrow">User Portal</p>
+            <h1 class="page-title">🏛️ Welcome, {{ session['user'] }}</h1>
+            <p class="page-subtitle">Manage your government services easily</p>
+        </div>
+
+        <!-- STATS -->
+        <div class="grid-4 mb-8">
+
+            <div class="stat-card">
+                <p class="stat-label">Total Applications</p>
+                <p class="stat-value">
+                    {{ applications|length if applications else 0 }}
+                </p>
+            </div>
+
+            <div class="stat-card">
+                <p class="stat-label">Pending</p>
+                <p class="stat-value" style="color:var(--amber-text);">
+                    {{ applications|selectattr('status','equalto','Pending')|list|length if applications else 0 }}
+                </p>
+            </div>
+
+            <div class="stat-card">
+                <p class="stat-label">Approved</p>
+                <p class="stat-value" style="color:var(--green-text);">
+                    {{ applications|selectattr('status','equalto','Approved')|list|length if applications else 0 }}
+                </p>
+            </div>
+
+            <div class="stat-card">
+                <p class="stat-label">Rejected</p>
+                <p class="stat-value" style="color:var(--red-text);">
+                    {{ applications|selectattr('status','equalto','Rejected')|list|length if applications else 0 }}
+                </p>
+            </div>
+
+        </div>
+
+        <!-- SUMMARY -->
+        <div class="card mb-6">
+            <p style="font-size:.9rem; color:var(--text-mid);">
+                📊 Status Summary:
+                {{ applications|selectattr('status','equalto','Pending')|list|length if applications else 0 }} pending ·
+                {{ applications|selectattr('status','equalto','Approved')|list|length if applications else 0 }} approved ·
+                {{ applications|selectattr('status','equalto','Rejected')|list|length if applications else 0 }} rejected
+            </p>
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="grid-2">
+
+            <div class="card card-hover">
+                <div style="font-size:1.4rem;margin-bottom:14px;">✎</div>
+                <p class="card-title">Apply for Service</p>
+                <p class="card-desc">
+                    Submit a new application for government services.
+                </p>
+                <a href="/apply" class="btn btn-primary">Apply Now</a>
+            </div>
+
+            <div class="card card-hover">
+                <div style="font-size:1.4rem;margin-bottom:14px;">◎</div>
+                <p class="card-title">Check Status</p>
+                <p class="card-desc">
+                    Track progress of your submitted applications.
+                </p>
+                <a href="/status" class="btn btn-ghost">View Status</a>
+            </div>
+
+        </div>
+
+        <!-- EMPTY STATE -->
+        {% if not applications %}
+        <div class="card mt-6">
+            <p style="text-align:center; color:var(--text-mid);">
+                You have not submitted any applications yet.
+            </p>
+        </div>
+        {% endif %}
+
+    </main>
+</div>
+
+</body>
+</html>

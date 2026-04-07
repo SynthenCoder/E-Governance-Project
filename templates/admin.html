@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel · Nepal E-Governance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <span class="sidebar-brand-icon">👑</span>
+            <div>
+                <div class="sidebar-brand-text">Admin Panel</div>
+                <div class="sidebar-brand-sub">Nepal Portal</div>
+            </div>
+        </div>
+
+        <span class="sidebar-label">Main</span>
+        <a href="/admin" class="sidebar-link active">
+            <span class="sidebar-link-icon">▦</span> Dashboard
+        </a>
+
+        <div class="sidebar-spacer"></div>
+
+        <a href="/logout" class="sidebar-link danger">
+            <span class="sidebar-link-icon">→</span> Logout
+        </a>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <div class="page-header animate-in">
+            <p class="page-eyebrow">Administration</p>
+            <h1 class="page-title">🏛️ Government Admin Dashboard</h1>
+            <p class="page-subtitle">Manage users and applications</p>
+        </div>
+
+        <!-- FLASH -->
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="card animate-in" style="margin-bottom:16px; padding:14px 16px;">
+            <p style="color:var(--green-text); font-weight:500;">{{ messages[0] }}</p>
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <!-- STATS -->
+        <div class="grid-4 mb-6">
+            <div class="stat-card">
+                <div class="stat-label">Total Users</div>
+                <div class="stat-value">{{ total_users }}</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Total Applications</div>
+                <div class="stat-value">{{ total_apps }}</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Pending</div>
+                <div class="stat-value" style="color:var(--amber-text);">{{ pending }}</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Approved</div>
+                <div class="stat-value" style="color:var(--green-text);">{{ approved }}</div>
+            </div>
+        </div>
+
+        <!-- CHART -->
+        <div class="card mb-6 animate-in">
+            <div class="card-title" style="margin-bottom:16px;">Applications Overview</div>
+            <canvas id="chart" height="110"></canvas>
+        </div>
+
+        <script>
+        const ctx = document.getElementById('chart');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Pending', 'Approved', 'Rejected'],
+                datasets: [{
+                    label: 'Applications',
+                    data: [{{ pending }}, {{ approved }}, {{ rejected }}],
+                    backgroundColor: [
+                        'rgba(245, 158, 11, 0.7)',
+                        'rgba(34, 197, 94, 0.7)',
+                        'rgba(239, 68, 68, 0.7)'
+                    ],
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#94a3b8'
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: '#94a3b8' },
+                        grid: { color: 'rgba(148,163,184,0.08)' }
+                    },
+                    y: {
+                        ticks: { color: '#94a3b8' },
+                        grid: { color: 'rgba(148,163,184,0.08)' }
+                    }
+                }
+            }
+        });
+        </script>
+
+        <!-- APPLICATIONS -->
+        <div class="card mb-6 animate-in">
+
+            <div style="margin-bottom:20px; display:flex; gap:10px;">
+                <a href="/admin?filter=pending"
+                   class="btn {{ 'btn-primary' if filter_status=='pending' else 'btn-ghost' }}">
+                    Pending
+                </a>
+
+                <a href="/admin?filter=approved"
+                   class="btn {{ 'btn-success' if filter_status=='approved' else 'btn-ghost' }}">
+                    Approved
+                </a>
+
+                <a href="/admin?filter=rejected"
+                   class="btn {{ 'btn-danger' if filter_status=='rejected' else 'btn-ghost' }}">
+                    Rejected
+                </a>
+            </div>
+
+            {% if applications %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User</th>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th>Document</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for app in applications %}
+                    <tr>
+                        <td>#{{ app.id }}</td>
+                        <td>{{ app.username }}</td>
+                        <td>{{ app.full_name }}</td>
+
+                        <td>
+                            {% if app.status == 'Pending' %}
+                                <span class="badge badge-pending">Pending</span>
+                            {% elif app.status == 'Approved' %}
+                                <span class="badge badge-approved">Approved</span>
+                            {% else %}
+                                <span class="badge badge-rejected">Rejected</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if app.file %}
+                                <a href="/uploads/{{ app.file }}" target="_blank" class="btn btn-ghost btn-sm">
+                                    📄 View PDF
+                                </a>
+                            {% else %}
+                                <span style="opacity:.5;">No file</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if app.status == 'Pending' %}
+                            <div class="flex gap-2">
+                                <form action="/approve/{{ app.id }}" method="POST">
+                                    <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                </form>
+
+                                <form action="/reject/{{ app.id }}" method="POST">
+                                    <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                </form>
+                            </div>
+                            {% else %}
+                            <span style="opacity:.6;">Done</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <p>No applications</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- USERS -->
+        <div class="card animate-in">
+            <div class="card-title">Users</div>
+
+            {% if users %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Role</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>#{{ user.id }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.role }}</td>
+                        <td>
+                            {% if user.role != 'admin' %}
+                            <form action="/delete-user/{{ user.id }}" method="POST">
+                                <button type="submit" onclick="return confirm('Delete this user?')" class="btn btn-danger btn-sm">
+                                    Delete
+                                </button>
+                            </form>
+                            {% else %}
+                            👑 Admin
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <p>No users found</p>
+            </div>
+            {% endif %}
+        </div>
+
+    </main>
+</div>
+
+</body>
+</html>

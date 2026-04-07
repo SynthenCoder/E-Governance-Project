@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Review · Nepal E-Governance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <span class="sidebar-brand-icon">🇳🇵</span>
+            <div>
+                <div class="sidebar-brand-text">E-Governance</div>
+                <div class="sidebar-brand-sub">Nepal Portal</div>
+            </div>
+        </div>
+
+        <span class="sidebar-label">Main</span>
+        <a href="/" class="sidebar-link">
+            <span class="sidebar-link-icon">⌂</span> Home
+        </a>
+
+        <span class="sidebar-label">Administration</span>
+        <a href="/admin" class="sidebar-link active">
+            <span class="sidebar-link-icon">⚙</span> Admin Panel
+        </a>
+
+        <div class="sidebar-spacer"></div>
+        <a href="/logout" class="sidebar-link danger">
+            <span class="sidebar-link-icon">→</span> Logout
+        </a>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <div class="page-header animate-in">
+            <p class="page-eyebrow">Administration</p>
+            <h1 class="page-title">📋 Application Review</h1>
+            <p class="page-subtitle">Approve or reject submitted applications</p>
+        </div>
+
+        <!-- FLASH -->
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="card" style="margin-bottom:16px; padding:14px;">
+            <p style="color:var(--green-text);">{{ messages[0] }}</p>
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <!-- TABLE -->
+        <div class="card animate-in">
+
+            {% if applications %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User</th>
+                        <th>Full Name</th>
+                        <th>Status</th>
+                        <th>Document</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for app in applications %}
+                    <tr>
+                        <td>#{{ app.id }}</td>
+                        <td>{{ app.username }}</td>
+                        <td>{{ app.full_name }}</td>
+
+                        <td>
+                            {% if app.status == 'Pending' %}
+                                <span class="badge badge-pending">Pending</span>
+                            {% elif app.status == 'Approved' %}
+                                <span class="badge badge-approved">Approved</span>
+                            {% else %}
+                                <span class="badge badge-rejected">Rejected</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- FILE -->
+                        <td>
+                            {% if app.file %}
+                                <a href="/uploads/{{ app.file }}" target="_blank" class="btn btn-ghost btn-sm">
+                                    📄 View
+                                </a>
+                            {% else %}
+                                <span style="opacity:.5;">No file</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- ACTION -->
+                        <td>
+                            {% if app.status == 'Pending' %}
+                            <div class="flex gap-2">
+                                <form action="/approve/{{ app.id }}" method="POST">
+                                    <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                </form>
+
+                                <form action="/reject/{{ app.id }}" method="POST">
+                                    <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                </form>
+                            </div>
+                            {% else %}
+                            <span style="opacity:.6;">Done</span>
+                            {% endif %}
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">◎</div>
+                <p class="empty-state-text">No applications to review</p>
+            </div>
+            {% endif %}
+
+        </div>
+
+    </main>
+</div>
+
+</body>
+</html>

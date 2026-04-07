@@ -1,13 +1,120 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nepal E-Governance Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Nepal E-Governance Portal 🇳🇵</h1>
-    <p>A simple digital public service prototype.</p>
 
-    <a href="/login">Login</a><br><br>
-    <a href="/register">Register</a>
+<!-- TOP NAV -->
+<nav class="topnav">
+    <div class="topnav-brand">
+        <span class="topnav-flag">🇳🇵</span>
+        <span class="topnav-name">Government of Nepal · E-Governance</span>
+    </div>
+    <div class="topnav-actions">
+        <a href="/login" class="btn btn-ghost">Sign in</a>
+        <a href="/register" class="btn btn-primary">Register</a>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <p class="hero-eyebrow">Official Digital Services Portal</p>
+
+    <h1 class="hero-title">
+        🇳🇵 Government Services<br>
+        Now Fully Online
+    </h1>
+
+    <p class="hero-subtitle">
+        Submit applications, track status, and receive official decisions digitally — 
+        securely and transparently from anywhere in Nepal.
+    </p>
+
+    <div class="hero-actions">
+        <a href="/register" class="btn btn-primary btn-lg">Create Account</a>
+        <a href="/login" class="btn btn-ghost btn-lg">Sign In</a>
+    </div>
+
+    <div class="hero-pillars">
+        <div class="pillar">⚡ Fast Processing</div>
+        <div class="pillar">🔍 Transparent System</div>
+        <div class="pillar">🔐 Secure & Official</div>
+    </div>
+</section>
+
+<!-- SERVICES -->
+<section class="section">
+    <h2 class="section-title">Available Services</h2>
+
+    <div class="grid-3">
+
+        <div class="card">
+            <div style="font-size:1.6rem;">📄</div>
+            <p class="card-title">Submit Application</p>
+            <p class="card-desc">
+                Apply for government services quickly through our online system.
+            </p>
+        </div>
+
+        <div class="card">
+            <div style="font-size:1.6rem;">📊</div>
+            <p class="card-title">Track Status</p>
+            <p class="card-desc">
+                Monitor your application status in real time.
+            </p>
+        </div>
+
+        <div class="card">
+            <div style="font-size:1.6rem;">📬</div>
+            <p class="card-title">Receive Decisions</p>
+            <p class="card-desc">
+                Get approval or rejection notifications instantly via email.
+            </p>
+        </div>
+
+    </div>
+</section>
+
+<!-- TRUST -->
+<section class="section" style="background:var(--card-bg);">
+    <h2 class="section-title">Why Use This Portal?</h2>
+
+    <div class="grid-3">
+
+        <div class="card">
+            <p class="card-title">Official Platform</p>
+            <p class="card-desc">
+                Developed as part of Nepal's digital transformation initiative.
+            </p>
+        </div>
+
+        <div class="card">
+            <p class="card-title">Secure System</p>
+            <p class="card-desc">
+                Your data is protected and handled under strict policies.
+            </p>
+        </div>
+
+        <div class="card">
+            <p class="card-title">Time Efficient</p>
+            <p class="card-desc">
+                Avoid long queues and process everything online.
+            </p>
+        </div>
+
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer style="padding:20px;text-align:center;font-size:.85rem;color:var(--text-mid);">
+    © 2026 Government of Nepal · E-Governance Portal  
+    <br>
+    All rights reserved.
+</footer>
+
 </body>
 </html>

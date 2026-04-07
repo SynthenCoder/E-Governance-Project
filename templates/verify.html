@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Account · Nepal E-Governance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<nav class="topnav">
+    <div class="topnav-brand">
+        <span class="topnav-flag">🇳🇵</span>
+        <span class="topnav-name">E-Governance Nepal</span>
+    </div>
+</nav>
+
+<div class="auth-wrap">
+    <div class="card auth-card animate-in">
+
+        <div class="auth-header">
+            <h1 class="auth-title">Verify your account</h1>
+            <p class="auth-subtitle">
+                OTP sent to <strong>{{ email }}</strong>
+            </p>
+        </div>
+
+        <!-- FLASH MESSAGE -->
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div style="
+            background: var(--red-muted);
+            border: 0.5px solid rgba(185,28,28,.25);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            font-size: .82rem;
+            color: var(--red-text);
+            margin-bottom: 18px;">
+            {{ messages[0] }}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <!-- FORM -->
+        <form method="POST">
+
+            <div class="form-group">
+                <label class="form-label">Enter OTP</label>
+                <input 
+                    class="form-input"
+                    type="text" 
+                    name="otp" 
+                    placeholder="6-digit code"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg btn-block mt-4">
+                Verify Account
+            </button>
+
+        </form>
+
+        <p class="auth-footer" style="margin-top:10px;">
+            Didn’t receive code?
+            <a href="/register" class="auth-link">Try again</a>
+        </p>
+
+    </div>
+</div>
+
+</body>
+</html>

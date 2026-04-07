@@ -1,5 +1,117 @@
-<h2>Login</h2>
-<form method="POST">
-  <input type="text" name="username" placeholder="Enter name">
-  <button type="submit">Login</button>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In · Nepal E-Governance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+    <div class="topnav-brand">
+        <span class="topnav-flag">🇳🇵</span>
+        <span class="topnav-name">Government of Nepal · E-Governance</span>
+    </div>
+    <div class="topnav-actions">
+        <a href="/" class="btn btn-ghost btn-sm">Home</a>
+    </div>
+</nav>
+
+<div class="auth-wrap">
+    <div class="card auth-card animate-in">
+
+        <!-- HEADER -->
+        <div class="auth-header">
+            <h1 class="auth-title">🔐 Secure Login</h1>
+            <p class="auth-subtitle">
+                Access official government services safely
+            </p>
+        </div>
+
+        <!-- FLASH MESSAGE -->
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div style="
+            background: var(--red-muted);
+            border: 0.5px solid rgba(185,28,28,.25);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            font-size: .82rem;
+            color: var(--red-text);
+            margin-bottom: 18px;">
+            {{ messages[0] }}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <!-- FORM -->
+        <form method="POST">
+
+            <div class="form-group">
+                <label class="form-label">Username</label>
+                <input class="form-input" type="text" name="username"
+                       placeholder="Enter your username"
+                       autocomplete="username" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input class="form-input" type="password" name="password"
+                       placeholder="Enter your password"
+                       autocomplete="current-password" required>
+            </div>
+
+            <!-- OPTIONAL UX -->
+            <div style="display:flex; justify-content:space-between; font-size:.75rem; margin-top:-6px; margin-bottom:12px;">
+                <label style="display:flex; align-items:center; gap:6px;">
+                    <input type="checkbox"> Remember me
+                </label>
+                <a href="#" style="color:var(--text-mid); text-decoration:none;">
+                    Forgot password?
+                </a>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg btn-block mt-2">
+                Sign in
+            </button>
+
+        </form>
+
+        <!-- EXTRA OPTIONS -->
+        <div style="
+            margin-top: 20px;
+            text-align: center;
+            font-size: .85rem;
+            color: var(--text-mid);">
+
+            <p style="margin-bottom: 6px;">
+                Don’t have an account?
+                <a href="/register" class="auth-link">Create one</a>
+            </p>
+
+            <!-- ADMIN LOGIN -->
+            <p style="margin-top: 10px;">
+                Admin access?
+                <a href="/admin-login" class="auth-link" style="color:#f87171;">
+                    Login here 👑
+                </a>
+            </p>
+
+        </div>
+
+        <!-- SECURITY NOTE -->
+        <p style="
+            margin-top:18px;
+            font-size:.7rem;
+            text-align:center;
+            color:var(--text-low);">
+            🔒 This system is protected. Unauthorized access is prohibited.
+        </p>
+
+    </div>
+</div>
+
+</body>
+</html>
