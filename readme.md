@@ -1,28 +1,26 @@
-# Nepal E-Governance Portal
+# 🇳🇵 Nepal E-Governance Portal
 
-A simple web-based prototype built with Flask and SQLite.
+A full-stack web application that digitizes government service applications.
 
-## Features
-- User registration
-- User login
-- Citizenship application form
-- Application status tracking
+## 🔥 Features
+- User registration with OTP verification
+- Secure login system
+- Admin dashboard
+- File upload (PDF)
+- Application approval/rejection
+- Email notifications
 
-## Tech Stack
-- Python
-- Flask
+## 🛠 Tech Stack
+- Python (Flask)
 - SQLite
-- HTML
+- HTML/CSS
+- SMTP (Email)
 
-## Purpose
-This project is a prototype for a digital governance system that can help modernize public services in Nepal.
+## 🚀 Live Demo
+[Your Render Link]
 
-## How to Run
-1. Install Flask:
-   pip install flask
+## 📸 Screenshots
+(Add screenshots here)
 
-2. Run the app:
-   python app.py
-
-3. Open in browser:
+## Open in browser:
    http://127.0.0.1:5000
