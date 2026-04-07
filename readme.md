@@ -23,4 +23,4 @@ A full-stack web application that digitizes government service applications.
 (Add screenshots here)
 
 ## Open in browser:
-   http://127.0.0.1:5000
+   https://nepal-egov-system.onrender.com
