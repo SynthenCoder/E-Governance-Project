@@ -12,7 +12,7 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
 # =========================
-# 🔥 FORCE NO CACHE (NEW)
+# 🔥 FORCE NO CACHE
 # =========================
 @app.after_request
 def add_header(response):
@@ -20,11 +20,6 @@ def add_header(response):
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"
     return response
-
-# =========================
-# OTP STORE (NEW 🔥)
-# =========================
-otp_store = {}
 
 # =========================
 # FILE UPLOAD CONFIG
@@ -35,10 +30,8 @@ ALLOWED_EXTENSIONS = {"pdf"}
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
-
 
 # =========================
 # EMAIL SYSTEM
@@ -70,16 +63,11 @@ def send_email(to_email, subject, body):
 # =========================
 DB_PATH = os.path.join(os.path.dirname(__file__), "database.db")
 
-
 def get_db():
-    # Use a project-local database file so data persists across restarts/deploys
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
-# =========================
-# 🔥 DB INIT FIX (NEW)
-# =========================
 def init_db():
     conn = sqlite3.connect(DB_PATH)
 
@@ -106,9 +94,7 @@ def init_db():
     conn.commit()
     conn.close()
 
-# 🔥 CALL INIT (IMPORTANT)
 init_db()
-
 
 # =========================
 # HOME
@@ -117,9 +103,8 @@ init_db()
 def home():
     return render_template("index.html")
 
-
 # =========================
-# REGISTER (UPDATED WITH OTP 🔥)
+# REGISTER (NO OTP)
 # =========================
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -159,64 +144,18 @@ def register():
             flash("Email already registered ❌")
             return redirect("/register")
 
-        conn.close()
-
-        # 🔥 GENERATE OTP
-        otp = str(random.randint(100000, 999999))
-
-        otp_store[email] = {
-            "otp": otp,
-            "user": user,
-            "password": generate_password_hash(password)
-        }
-
-        send_email(
-            email,
-            "Your OTP Code",
-            f"Your verification code is: {otp}"
-        )
-
-        flash("OTP sent to your email 📩")
-        return redirect(f"/verify?email={email}")
-
-    return render_template("register.html")
-
-
-# =========================
-# VERIFY OTP (NEW 🔥)
-# =========================
-@app.route("/verify", methods=["GET", "POST"])
-def verify():
-    email = request.args.get("email")
-
-    if request.method == "POST":
-        entered_otp = request.form["otp"]
-
-        data = otp_store.get(email)
-
-        if not data:
-            flash("Session expired ❌")
-            return redirect("/register")
-
-        if entered_otp != data["otp"]:
-            flash("Invalid OTP ❌")
-            return redirect(f"/verify?email={email}")
-
-        conn = get_db()
         conn.execute(
             "INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)",
-            (data["user"], email, data["password"], "user")
+            (user, email, generate_password_hash(password), "user")
         )
+
         conn.commit()
         conn.close()
-
-        otp_store.pop(email)
 
         flash("Account created ✅")
         return redirect("/login")
 
-    return render_template("verify.html", email=email)
-
+    return render_template("register.html")
 
 # =========================
 # ADMIN REGISTER
@@ -266,7 +205,6 @@ def admin_register():
 
     return render_template("admin_register.html")
 
-
 # =========================
 # LOGIN (USER)
 # =========================
@@ -299,7 +237,6 @@ def login():
         return redirect("/login")
 
     return render_template("login.html")
-
 
 # =========================
 # ADMIN LOGIN
@@ -334,7 +271,6 @@ def admin_login():
 
     return render_template("admin_login.html")
 
-
 # =========================
 # LOGOUT
 # =========================
@@ -342,7 +278,6 @@ def admin_login():
 def logout():
     session.clear()
     return redirect("/login")
-
 
 # =========================
 # DASHBOARD
@@ -363,7 +298,6 @@ def dashboard():
     conn.close()
 
     return render_template("dashboard.html", applications=apps)
-
 
 # =========================
 # APPLY
@@ -416,14 +350,12 @@ def apply():
 
     return render_template("apply.html")
 
-
 # =========================
 # VIEW FILE
 # =========================
 @app.route("/uploads/<filename>")
 def uploaded_file(filename):
     return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
-
 
 # =========================
 # STATUS
@@ -441,7 +373,6 @@ def status():
     conn.close()
 
     return render_template("status.html", applications=data)
-
 
 # =========================
 # ADMIN PANEL
@@ -491,7 +422,6 @@ def admin():
         filter_status=filter_status
     )
 
-
 # =========================
 # APPROVE
 # =========================
@@ -534,7 +464,6 @@ def approve(id):
 
     flash("Approved ✅")
     return redirect("/admin", code=303)
-
 
 # =========================
 # REJECT
@@ -579,7 +508,6 @@ def reject(id):
     flash("Rejected ❌")
     return redirect("/admin", code=303)
 
-
 # =========================
 # DELETE USER
 # =========================
@@ -600,12 +528,9 @@ def delete_user(id):
     conn.close()
     return redirect("/admin")
 
-
 # =========================
 # RUN
 # =========================
-import os
-
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
