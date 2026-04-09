@@ -68,8 +68,12 @@ def send_email(to_email, subject, body):
 # =========================
 # DATABASE
 # =========================
+DB_PATH = os.path.join(os.path.dirname(__file__), "database.db")
+
+
 def get_db():
-    conn = sqlite3.connect("/tmp/database.db")
+    # Use a project-local database file so data persists across restarts/deploys
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -77,7 +81,7 @@ def get_db():
 # 🔥 DB INIT FIX (NEW)
 # =========================
 def init_db():
-    conn = sqlite3.connect("/tmp/database.db")
+    conn = sqlite3.connect(DB_PATH)
 
     conn.execute("""
     CREATE TABLE IF NOT EXISTS users (
