@@ -5,6 +5,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Application Review · Nepal E-Governance</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .review-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .review-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: var(--amber-muted);
+            border: 1px solid hsl(36 90% 43% / 0.2);
+            border-radius: var(--radius-full);
+            font-size: 0.76rem;
+            font-weight: 500;
+            color: var(--amber-text);
+        }
+
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .user-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--blue-glow);
+            border: 1px solid hsl(212 90% 60% / 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.66rem;
+            font-weight: 600;
+            color: hsl(212 90% 75%);
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+    </style>
 </head>
 <body>
 
@@ -42,20 +87,29 @@
         <div class="page-header animate-in">
             <p class="page-eyebrow">Administration</p>
             <h1 class="page-title">📋 Application Review</h1>
-            <p class="page-subtitle">Approve or reject submitted applications</p>
+            <p class="page-subtitle">Approve or reject pending applications</p>
         </div>
 
         <!-- FLASH -->
         {% with messages = get_flashed_messages() %}
         {% if messages %}
-        <div class="card" style="margin-bottom:16px; padding:14px;">
-            <p style="color:var(--green-text);">{{ messages[0] }}</p>
-        </div>
+        <div class="flash-success animate-in" style="margin-bottom:20px;">{{ messages[0] }}</div>
         {% endif %}
         {% endwith %}
 
         <!-- TABLE -->
         <div class="card animate-in">
+
+            <div class="review-header">
+                <div style="font-family:'Cormorant', serif; font-size:1.05rem; font-weight:500; color:var(--text-high);">
+                    Pending Applications
+                </div>
+                {% if applications %}
+                <span class="review-count">
+                    ⏳ {{ applications|length }} awaiting review
+                </span>
+                {% endif %}
+            </div>
 
             {% if applications %}
             <table class="data-table">
@@ -69,14 +123,17 @@
                         <th>Actions</th>
                     </tr>
                 </thead>
-
                 <tbody>
                     {% for app in applications %}
                     <tr>
-                        <td>#{{ app.id }}</td>
-                        <td>{{ app.username }}</td>
-                        <td>{{ app.full_name }}</td>
-
+                        <td style="font-family:monospace; font-size:0.75rem; color:var(--text-muted);">#{{ app.id }}</td>
+                        <td>
+                            <div class="user-cell">
+                                <div class="user-avatar">{{ app.username[0] }}</div>
+                                {{ app.username }}
+                            </div>
+                        </td>
+                        <td style="font-weight:500; color:var(--text-high);">{{ app.full_name }}</td>
                         <td>
                             {% if app.status == 'Pending' %}
                                 <span class="badge badge-pending">Pending</span>
@@ -86,35 +143,27 @@
                                 <span class="badge badge-rejected">Rejected</span>
                             {% endif %}
                         </td>
-
-                        <!-- FILE -->
                         <td>
                             {% if app.file %}
-                                <a href="/uploads/{{ app.file }}" target="_blank" class="btn btn-ghost btn-sm">
-                                    📄 View
-                                </a>
+                                <a href="/uploads/{{ app.file }}" target="_blank" class="btn btn-ghost btn-sm">📄 View</a>
                             {% else %}
-                                <span style="opacity:.5;">No file</span>
+                                <span style="opacity:.4; font-size:0.78rem;">No file</span>
                             {% endif %}
                         </td>
-
-                        <!-- ACTION -->
                         <td>
                             {% if app.status == 'Pending' %}
                             <div class="flex gap-2">
                                 <form action="/approve/{{ app.id }}" method="POST">
-                                    <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                    <button type="submit" class="btn btn-success btn-sm">✓ Approve</button>
                                 </form>
-
                                 <form action="/reject/{{ app.id }}" method="POST">
-                                    <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                    <button type="submit" class="btn btn-danger btn-sm">✗ Reject</button>
                                 </form>
                             </div>
                             {% else %}
-                            <span style="opacity:.6;">Done</span>
+                            <span style="opacity:.4; font-size:0.78rem;">Completed</span>
                             {% endif %}
                         </td>
-
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -122,8 +171,8 @@
 
             {% else %}
             <div class="empty-state">
-                <div class="empty-state-icon">◎</div>
-                <p class="empty-state-text">No applications to review</p>
+                <div class="empty-state-icon">✅</div>
+                <p class="empty-state-text">No pending applications to review.</p>
             </div>
             {% endif %}
 

@@ -5,112 +5,175 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign In · Nepal E-Governance</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body { overflow: hidden; }
+        @media (max-width: 768px) { body { overflow: auto; } }
+
+        .remember-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.76rem;
+            margin-top: -6px;
+            margin-bottom: 16px;
+            color: var(--text-low);
+        }
+
+        .remember-label {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            cursor: pointer;
+        }
+
+        .remember-label input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            accent-color: var(--blue);
+            cursor: pointer;
+        }
+
+        .forgot-link {
+            color: var(--text-low);
+            font-size: 0.75rem;
+            transition: color var(--transition-fast);
+        }
+        .forgot-link:hover { color: var(--blue); }
+
+        .security-note {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 20px;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            padding: 10px;
+            background: var(--bg-elevated);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+
+        /* Animated visual panel decorations */
+        .vis-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid;
+            animation: spin-slow linear infinite;
+        }
+    </style>
 </head>
 <body>
 
-<!-- TOP NAV -->
-<nav class="topnav">
-    <div class="topnav-brand">
-        <span class="topnav-flag">🇳🇵</span>
-        <span class="topnav-name">Government of Nepal · E-Governance</span>
-    </div>
-    <div class="topnav-actions">
-        <a href="/" class="btn btn-ghost btn-sm">Home</a>
-    </div>
-</nav>
+<div class="auth-split">
 
-<div class="auth-wrap">
-    <div class="card auth-card animate-in">
+    <!-- FORM PANEL -->
+    <div class="auth-panel">
+        <div class="auth-card animate-in">
 
-        <!-- HEADER -->
-        <div class="auth-header">
-            <h1 class="auth-title">🔐 Secure Login</h1>
-            <p class="auth-subtitle">
-                Access official government services safely
-            </p>
-        </div>
-
-        <!-- FLASH MESSAGE -->
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        <div style="
-            background: var(--red-muted);
-            border: 0.5px solid rgba(185,28,28,.25);
-            border-radius: var(--radius-sm);
-            padding: 10px 14px;
-            font-size: .82rem;
-            color: var(--red-text);
-            margin-bottom: 18px;">
-            {{ messages[0] }}
-        </div>
-        {% endif %}
-        {% endwith %}
-
-        <!-- FORM -->
-        <form method="POST">
-
-            <div class="form-group">
-                <label class="form-label">Username</label>
-                <input class="form-input" type="text" name="username"
-                       placeholder="Enter your username"
-                       autocomplete="username" required>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Password</label>
-                <input class="form-input" type="password" name="password"
-                       placeholder="Enter your password"
-                       autocomplete="current-password" required>
-            </div>
-
-            <!-- OPTIONAL UX -->
-            <div style="display:flex; justify-content:space-between; font-size:.75rem; margin-top:-6px; margin-bottom:12px;">
-                <label style="display:flex; align-items:center; gap:6px;">
-                    <input type="checkbox"> Remember me
-                </label>
-                <a href="#" style="color:var(--text-mid); text-decoration:none;">
-                    Forgot password?
+            <!-- NAV BACK -->
+            <div style="margin-bottom:32px;">
+                <a href="/" style="font-size:0.78rem; color:var(--text-low); display:inline-flex; align-items:center; gap:6px; transition:color var(--transition-fast);" onmouseover="this.style.color='var(--text-high)'" onmouseout="this.style.color='var(--text-low)'">
+                    ← Back to Home
                 </a>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-lg btn-block mt-2">
-                Sign in
-            </button>
+            <div class="auth-header">
+                <h1 class="auth-title">🔐 Secure Login</h1>
+                <p class="auth-subtitle">Access official government services safely</p>
+            </div>
 
-        </form>
+            <!-- FLASH MESSAGE -->
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div class="flash-error">{{ messages[0] }}</div>
+            {% endif %}
+            {% endwith %}
 
-        <!-- EXTRA OPTIONS -->
-        <div style="
-            margin-top: 20px;
-            text-align: center;
-            font-size: .85rem;
-            color: var(--text-mid);">
+            <!-- FORM -->
+            <form method="POST">
 
-            <p style="margin-bottom: 6px;">
-                Don’t have an account?
-                <a href="/register" class="auth-link">Create one</a>
-            </p>
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input class="form-input" type="text" name="username"
+                           placeholder="Enter your username"
+                           autocomplete="username" required>
+                </div>
 
-            <!-- ADMIN LOGIN -->
-            <p style="margin-top: 10px;">
-                Admin access?
-                <a href="/admin-login" class="auth-link" style="color:#f87171;">
-                    Login here 👑
-                </a>
-            </p>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input class="form-input" type="password" name="password"
+                           placeholder="Enter your password"
+                           autocomplete="current-password" required>
+                </div>
+
+                <div class="remember-row">
+                    <label class="remember-label">
+                        <input type="checkbox"> Remember me
+                    </label>
+                    <a href="#" class="forgot-link">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg btn-block">
+                    Sign in to Portal
+                </button>
+
+            </form>
+
+            <div style="margin-top:24px; text-align:center; font-size:0.85rem; color:var(--text-mid);">
+                <p style="margin-bottom:8px;">
+                    Don't have an account?
+                    <a href="/register" class="auth-link">Create one</a>
+                </p>
+                <p style="margin-top:10px; font-size:0.8rem;">
+                    Admin access?
+                    <a href="/admin-login" class="auth-link" style="color:var(--crimson-text);">Login here 👑</a>
+                </p>
+            </div>
+
+            <div class="security-note">
+                🔒 This system is protected. Unauthorized access is prohibited.
+            </div>
 
         </div>
+    </div>
 
-        <!-- SECURITY NOTE -->
-        <p style="
-            margin-top:18px;
-            font-size:.7rem;
-            text-align:center;
-            color:var(--text-low);">
-            🔒 This system is protected. Unauthorized access is prohibited.
+    <!-- VISUAL PANEL -->
+    <div class="auth-visual">
+
+        <!-- Decorative rings -->
+        <div class="vis-ring" style="width:380px;height:380px;border-color:hsl(212 90% 60% / 0.06);top:50%;left:50%;transform:translate(-50%,-50%);animation-duration:30s;"></div>
+        <div class="vis-ring" style="width:260px;height:260px;border-color:hsl(212 90% 60% / 0.09);top:50%;left:50%;transform:translate(-50%,-50%);animation-duration:20s;animation-direction:reverse;"></div>
+
+        <div class="auth-visual-icon">🏛️</div>
+
+        <h2 class="auth-visual-title">Nepal E-Governance</h2>
+        <p class="auth-visual-desc">
+            Your secure gateway to official government services. 
+            Fast, transparent, and available everywhere in Nepal.
         </p>
 
+        <div class="auth-visual-features">
+            <div class="auth-feature-item">
+                <span class="auth-feature-icon">⚡</span>
+                <span class="auth-feature-text">Applications processed digitally</span>
+            </div>
+            <div class="auth-feature-item">
+                <span class="auth-feature-icon">🔍</span>
+                <span class="auth-feature-text">Real-time status tracking</span>
+            </div>
+            <div class="auth-feature-item">
+                <span class="auth-feature-icon">🔐</span>
+                <span class="auth-feature-text">End-to-end encrypted & secure</span>
+            </div>
+            <div class="auth-feature-item">
+                <span class="auth-feature-icon">🇳🇵</span>
+                <span class="auth-feature-text">Official Government of Nepal portal</span>
+            </div>
+        </div>
+
     </div>
+
 </div>
 
 </body>

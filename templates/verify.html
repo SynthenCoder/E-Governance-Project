@@ -5,9 +5,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verify Account · Nepal E-Governance</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .otp-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin: 8px 0 4px;
+        }
+
+        .otp-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .otp-input {
+            width: 54px;
+            height: 62px;
+            text-align: center;
+            font-family: 'Cormorant', serif;
+            font-size: 1.9rem;
+            font-weight: 500;
+            background: var(--bg-elevated);
+            border: 1.5px solid var(--border-em);
+            color: var(--text-high);
+            border-radius: var(--radius-md);
+            outline: none;
+            transition: border-color var(--transition), box-shadow var(--transition), transform var(--duration-fast) var(--ease-spring);
+            -moz-appearance: textfield;
+        }
+
+        .otp-input::-webkit-outer-spin-button,
+        .otp-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+        .otp-input:focus {
+            border-color: var(--blue);
+            box-shadow: var(--shadow-glow-blue);
+            transform: translateY(-2px);
+        }
+
+        .otp-hint {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        /* Expiry timer display */
+        .otp-timer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        .timer-val {
+            font-family: 'Cormorant', serif;
+            font-size: 0.9rem;
+            color: var(--amber-text);
+            font-weight: 500;
+        }
+
+        /* Email highlight */
+        .email-highlight {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            background: var(--blue-subtle);
+            border: 1px solid hsl(212 90% 60% / 0.18);
+            border-radius: var(--radius-full);
+            font-size: 0.82rem;
+            color: hsl(212 90% 75%);
+            font-weight: 500;
+            margin-top: 6px;
+        }
+    </style>
 </head>
 <body>
 
+<!-- TOP NAV -->
 <nav class="topnav">
     <div class="topnav-brand">
         <span class="topnav-flag">🇳🇵</span>
@@ -16,58 +94,106 @@
 </nav>
 
 <div class="auth-wrap">
-    <div class="card auth-card animate-in">
+    <div class="auth-card animate-in">
 
-        <div class="auth-header">
-            <h1 class="auth-title">Verify your account</h1>
+        <!-- Icon -->
+        <div style="text-align:center; margin-bottom:28px;">
+            <span style="font-size:3rem; filter:drop-shadow(0 4px 16px hsl(212 90% 60% / 0.3));">📩</span>
+        </div>
+
+        <div class="auth-header" style="text-align:center;">
+            <h1 class="auth-title">Verify Your Account</h1>
             <p class="auth-subtitle">
-                OTP sent to <strong>{{ email }}</strong>
+                A 6-digit code has been sent to
             </p>
+            <div class="email-highlight">
+                ✉️ {{ email }}
+            </div>
         </div>
 
         <!-- FLASH MESSAGE -->
         {% with messages = get_flashed_messages() %}
         {% if messages %}
-        <div style="
-            background: var(--red-muted);
-            border: 0.5px solid rgba(185,28,28,.25);
-            border-radius: var(--radius-sm);
-            padding: 10px 14px;
-            font-size: .82rem;
-            color: var(--red-text);
-            margin-bottom: 18px;">
-            {{ messages[0] }}
-        </div>
+        <div class="flash-error" style="margin-bottom:20px;">{{ messages[0] }}</div>
         {% endif %}
         {% endwith %}
 
-        <!-- FORM -->
-        <form method="POST">
+        <!-- FORM with segmented OTP inputs -->
+        <form method="POST" id="otp-form">
 
-            <div class="form-group">
-                <label class="form-label">Enter OTP</label>
-                <input 
-                    class="form-input"
-                    type="text" 
-                    name="otp" 
-                    placeholder="6-digit code"
-                    required
-                >
+            <div class="form-group" style="margin-bottom:8px;">
+                <label class="form-label" style="text-align:center; display:block;">Enter OTP</label>
+
+                <div class="otp-wrapper">
+                    <div class="otp-group" id="otp-group">
+                        <input class="otp-input" type="number" maxlength="1" min="0" max="9" inputmode="numeric" autofocus>
+                        <input class="otp-input" type="number" maxlength="1" min="0" max="9" inputmode="numeric">
+                        <input class="otp-input" type="number" maxlength="1" min="0" max="9" inputmode="numeric">
+                        <input class="otp-input" type="number" maxlength="1" min="0" max="9" inputmode="numeric">
+                        <input class="otp-input" type="number" maxlength="1" min="0" max="9" inputmode="numeric">
+                        <input class="otp-input" type="number" maxlength="1" min="0" max="9" inputmode="numeric">
+                    </div>
+                    <p class="otp-hint">Enter each digit in the box above</p>
+                </div>
+
+                <!-- Hidden input that collects the full code -->
+                <input type="hidden" name="otp" id="otp-hidden">
             </div>
 
-            <button type="submit" class="btn btn-primary btn-lg btn-block mt-4">
+            <button type="submit" class="btn btn-primary btn-lg btn-block mt-4" id="verify-btn">
                 Verify Account
             </button>
 
         </form>
 
-        <p class="auth-footer" style="margin-top:10px;">
-            Didn’t receive code?
+        <p class="auth-footer" style="margin-top:14px;">
+            Didn't receive a code?
             <a href="/register" class="auth-link">Try again</a>
         </p>
 
     </div>
 </div>
+
+<script>
+// Auto-advance OTP inputs
+const group   = document.getElementById('otp-group');
+const inputs  = Array.from(group.querySelectorAll('.otp-input'));
+const hidden  = document.getElementById('otp-hidden');
+const form    = document.getElementById('otp-form');
+
+inputs.forEach((inp, i) => {
+    inp.addEventListener('input', e => {
+        const val = e.target.value.slice(-1);
+        e.target.value = val;
+        if (val && i < inputs.length - 1) inputs[i + 1].focus();
+        hidden.value = inputs.map(x => x.value).join('');
+    });
+
+    inp.addEventListener('keydown', e => {
+        if (e.key === 'Backspace' && !inp.value && i > 0) {
+            inputs[i - 1].focus();
+        }
+        if (e.key === 'ArrowLeft' && i > 0) inputs[i - 1].focus();
+        if (e.key === 'ArrowRight' && i < inputs.length - 1) inputs[i + 1].focus();
+    });
+
+    // Handle paste
+    inp.addEventListener('paste', e => {
+        e.preventDefault();
+        const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+        pasted.split('').forEach((ch, j) => {
+            if (inputs[j]) inputs[j].value = ch;
+        });
+        hidden.value = inputs.map(x => x.value).join('');
+        const next = inputs[pasted.length] || inputs[inputs.length - 1];
+        next.focus();
+    });
+});
+
+form.addEventListener('submit', () => {
+    hidden.value = inputs.map(x => x.value).join('');
+});
+</script>
 
 </body>
 </html>

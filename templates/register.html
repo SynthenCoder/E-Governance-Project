@@ -5,107 +5,138 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Account · Nepal E-Governance</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .vis-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid;
+            animation: spin-slow linear infinite;
+        }
+
+        .password-hint {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+    </style>
 </head>
 <body>
 
-<!-- TOP NAV -->
-<nav class="topnav">
-    <div class="topnav-brand">
-        <span class="topnav-flag">🇳🇵</span>
-        <span class="topnav-name">Government of Nepal · E-Governance</span>
-    </div>
-    <div class="topnav-actions">
-        <a href="/login" class="btn btn-ghost btn-sm">Sign in</a>
-    </div>
-</nav>
+<div class="auth-split">
 
-<div class="auth-wrap">
-    <div class="card auth-card animate-in">
+    <!-- FORM PANEL -->
+    <div class="auth-panel" style="align-items:flex-start; overflow-y:auto;">
+        <div class="auth-card animate-in" style="padding-top:20px;">
 
-        <!-- HEADER -->
-        <div class="auth-header">
-            <h1 class="auth-title">📝 Create Account</h1>
-            <p class="auth-subtitle">
-                Register to access official government services
+            <div style="margin-bottom:28px;">
+                <a href="/login" style="font-size:0.78rem; color:var(--text-low); display:inline-flex; align-items:center; gap:6px; transition:color var(--transition-fast);" onmouseover="this.style.color='var(--text-high)'" onmouseout="this.style.color='var(--text-low)'">
+                    ← Back to Sign In
+                </a>
+            </div>
+
+            <div class="auth-header">
+                <h1 class="auth-title">📝 Create Account</h1>
+                <p class="auth-subtitle">Register to access official government services</p>
+            </div>
+
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div class="flash-error">{{ messages[0] }}</div>
+            {% endif %}
+            {% endwith %}
+
+            <form method="POST">
+
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input class="form-input" type="text" name="username"
+                           placeholder="Choose a unique username"
+                           autocomplete="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input class="form-input" type="email" name="email"
+                           placeholder="your@email.com"
+                           autocomplete="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input class="form-input" type="password" name="password"
+                           placeholder="Create a strong password"
+                           autocomplete="new-password" required>
+                    <p class="password-hint">🔒 Minimum 6 characters</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Confirm Password</label>
+                    <input class="form-input" type="password" name="confirm_password"
+                           placeholder="Re-enter your password" required>
+                </div>
+
+                <button type="submit" class="btn btn-success btn-lg btn-block mt-3">
+                    Create Account
+                </button>
+
+            </form>
+
+            <p class="auth-footer">
+                Already registered?
+                <a href="/login" class="auth-link">Sign in</a>
             </p>
+
+            <p class="auth-footer" style="margin-top:8px;">
+                Admin setup?
+                <a href="/admin-register" class="auth-link" style="color:var(--crimson-text);">
+                    Create Admin Account 👑
+                </a>
+            </p>
+
+            <div style="margin-top:20px; display:flex; align-items:center; justify-content:center; gap:6px; font-size:0.7rem; color:var(--text-muted); padding:10px; background:var(--bg-elevated); border-radius:var(--radius-sm); border:1px solid var(--border);">
+                🔒 Your data is securely stored and protected.
+            </div>
+
         </div>
+    </div>
 
-        <!-- FLASH -->
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        <div style="background:var(--red-muted);border:0.5px solid rgba(185,28,28,.25);border-radius:var(--radius-sm);padding:10px 14px;font-size:.82rem;color:var(--red-text);margin-bottom:18px;">
-            {{ messages[0] }}
+    <!-- VISUAL PANEL -->
+    <div class="auth-visual">
+
+        <div class="vis-ring" style="width:400px;height:400px;border-color:hsl(142 71% 40% / 0.06);top:50%;left:50%;transform:translate(-50%,-50%);animation-duration:35s;"></div>
+        <div class="vis-ring" style="width:250px;height:250px;border-color:hsl(142 71% 40% / 0.08);top:50%;left:50%;transform:translate(-50%,-50%);animation-duration:22s;animation-direction:reverse;"></div>
+
+        <div class="auth-visual-icon">🎯</div>
+
+        <h2 class="auth-visual-title">Start Your Journey</h2>
+        <p class="auth-visual-desc">
+            Join thousands of Nepali citizens already using the portal to access government services from home.
+        </p>
+
+        <div class="auth-visual-features">
+            <div class="auth-feature-item">
+                <span class="auth-feature-icon">📄</span>
+                <span class="auth-feature-text">Submit service applications online</span>
+            </div>
+            <div class="auth-feature-item">
+                <span class="auth-feature-icon">📊</span>
+                <span class="auth-feature-text">Track all your applications</span>
+            </div>
+            <div class="auth-feature-item">
+                <span class="auth-feature-icon">🔔</span>
+                <span class="auth-feature-text">Instant decision notifications</span>
+            </div>
+            <div class="auth-feature-item">
+                <span class="auth-feature-icon">🆓</span>
+                <span class="auth-feature-text">Free for all Nepali citizens</span>
+            </div>
         </div>
-        {% endif %}
-        {% endwith %}
-
-        <!-- FORM -->
-        <form method="POST">
-
-            <!-- USERNAME -->
-            <div class="form-group">
-                <label class="form-label">Username</label>
-                <input class="form-input" type="text" name="username"
-                       placeholder="Choose a username"
-                       autocomplete="username" required>
-            </div>
-
-            <!-- EMAIL -->
-            <div class="form-group">
-                <label class="form-label">Email</label>
-                <input class="form-input" type="email" name="email"
-                       placeholder="Enter your email"
-                       autocomplete="email" required>
-            </div>
-
-            <!-- PASSWORD -->
-            <div class="form-group">
-                <label class="form-label">Password</label>
-                <input class="form-input" type="password" name="password"
-                       placeholder="Create a password"
-                       autocomplete="new-password" required>
-                <small style="font-size:.7rem;color:var(--text-mid);">
-                    Must be at least 6 characters
-                </small>
-            </div>
-
-            <!-- CONFIRM PASSWORD -->
-            <div class="form-group">
-                <label class="form-label">Confirm Password</label>
-                <input class="form-input" type="password" name="confirm_password"
-                       placeholder="Re-enter your password"
-                       autocomplete="new-password" required>
-            </div>
-
-            <button type="submit" class="btn btn-success btn-lg btn-block mt-3">
-                Create Account
-            </button>
-
-        </form>
-
-        <!-- FOOTER -->
-        <p class="auth-footer">
-            Already registered?
-            <a href="/login" class="auth-link">Sign in</a>
-        </p>
-
-        <p class="auth-footer" style="margin-top:10px;">
-            Admin setup?
-            <a href="/admin-register" class="auth-link" style="color:#f87171;">
-                Create Admin Account 👑
-            </a>
-        </p>
-
-        <!-- SECURITY NOTE -->
-        <p style="
-            margin-top:18px;
-            font-size:.7rem;
-            text-align:center;
-            color:var(--text-low);">
-            🔒 Your data is securely stored and protected.
-        </p>
 
     </div>
+
 </div>
 
 </body>

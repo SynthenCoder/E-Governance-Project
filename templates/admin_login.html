@@ -5,90 +5,123 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login · Nepal E-Governance</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+    <style>
+        .vis-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid;
+            animation: spin-slow linear infinite;
+        }
 
+        .admin-warning {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 12px 14px;
+            background: var(--crimson-muted);
+            border: 1px solid var(--crimson-border);
+            border-radius: var(--radius-sm);
+            font-size: 0.76rem;
+            color: var(--crimson-text);
+            margin-top: 20px;
+            line-height: 1.55;
+        }
+    </style>
+</head>
 <body>
 
-<nav class="topnav">
-    <div class="topnav-brand">
-        <span class="topnav-flag">🇳🇵</span>
-        <span class="topnav-name">E-Governance Nepal</span>
-    </div>
-    <div class="topnav-actions">
-        <a href="/" class="btn btn-ghost btn-sm">Home</a>
-    </div>
-</nav>
+<div class="auth-split" style="flex-direction:row-reverse;">
 
-<div class="auth-wrap">
-    <div class="card auth-card animate-in">
+    <!-- VISUAL PANEL (left) -->
+    <div class="auth-visual" style="border-left:none; border-right:1px solid var(--border);">
 
-        <div class="auth-header">
-            <h1 class="auth-title">🔒 Admin Access</h1>
-            <p class="auth-subtitle">Restricted system control panel</p>
+        <div class="vis-ring" style="width:380px;height:380px;border-color:hsl(348 83% 47% / 0.08);top:50%;left:50%;transform:translate(-50%,-50%);animation-duration:28s;"></div>
+        <div class="vis-ring" style="width:240px;height:240px;border-color:hsl(348 83% 47% / 0.12);top:50%;left:50%;transform:translate(-50%,-50%);animation-duration:18s;animation-direction:reverse;"></div>
+
+        <div class="auth-visual-icon">👑</div>
+
+        <h2 class="auth-visual-title" style="color:var(--crimson-text);">Admin Control</h2>
+        <p class="auth-visual-desc">
+            Restricted access panel. Only authorized administrators may proceed.
+        </p>
+
+        <div class="auth-visual-features">
+            <div class="auth-feature-item">
+                <span class="auth-feature-icon">📋</span>
+                <span class="auth-feature-text">Review & approve applications</span>
+            </div>
+            <div class="auth-feature-item">
+                <span class="auth-feature-icon">👥</span>
+                <span class="auth-feature-text">Manage registered users</span>
+            </div>
+            <div class="auth-feature-item">
+                <span class="auth-feature-icon">📊</span>
+                <span class="auth-feature-text">View portal analytics</span>
+            </div>
+            <div class="auth-feature-item" style="border-color:var(--crimson-border); background:var(--crimson-muted);">
+                <span class="auth-feature-icon">⚠️</span>
+                <span class="auth-feature-text" style="color:var(--crimson-text);">Restricted system access only</span>
+            </div>
         </div>
 
-        <!-- FLASH MESSAGE -->
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        <div style="background:var(--red-muted);
-                    border:0.5px solid rgba(185,28,28,.25);
-                    border-radius:var(--radius-sm);
-                    padding:10px 14px;
-                    font-size:.82rem;
-                    color:var(--red-text);
-                    margin-bottom:18px;">
-            {{ messages[0] }}
-        </div>
-        {% endif %}
-        {% endwith %}
+    </div>
 
-        <!-- FORM -->
-        <form method="POST">
+    <!-- FORM PANEL -->
+    <div class="auth-panel">
+        <div class="auth-card animate-in">
 
-            <div class="form-group">
-                <label class="form-label">Username</label>
-                <input 
-                    class="form-input" 
-                    type="text" 
-                    name="username" 
-                    placeholder="Admin username"
-                    autocomplete="username"
-                    required
-                >
+            <div style="margin-bottom:28px;">
+                <a href="/" style="font-size:0.78rem; color:var(--text-low); display:inline-flex; align-items:center; gap:6px; transition:color var(--transition-fast);" onmouseover="this.style.color='var(--text-high)'" onmouseout="this.style.color='var(--text-low)'">
+                    ← Back to Home
+                </a>
             </div>
 
-            <div class="form-group">
-                <label class="form-label">Password</label>
-                <input 
-                    class="form-input" 
-                    type="password" 
-                    name="password" 
-                    placeholder="Admin password"
-                    autocomplete="current-password"
-                    required
-                >
+            <div class="auth-header">
+                <h1 class="auth-title">🔒 Admin Access</h1>
+                <p class="auth-subtitle">Restricted system control panel</p>
             </div>
 
-            <button type="submit" class="btn btn-danger btn-lg btn-block mt-4">
-                Login as Admin
-            </button>
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div class="flash-error">{{ messages[0] }}</div>
+            {% endif %}
+            {% endwith %}
 
-            <!-- SECURITY MESSAGE -->
-            <p style="margin-top:12px; font-size:.75rem; color:var(--text-low); text-align:center;">
-                Unauthorized access is strictly prohibited and may be subject to legal action.
-            </p>
+            <form method="POST">
 
-        </form>
+                <div class="form-group">
+                    <label class="form-label">Admin Username</label>
+                    <input class="form-input" type="text" name="username"
+                           placeholder="Enter admin username"
+                           autocomplete="username" required>
+                </div>
 
-        <!-- FOOTER -->
-        <div style="margin-top:18px; text-align:center; font-size:.85rem; color:var(--text-mid);">
-            <p>
+                <div class="form-group">
+                    <label class="form-label">Admin Password</label>
+                    <input class="form-input" type="password" name="password"
+                           placeholder="Enter admin password"
+                           autocomplete="current-password" required>
+                </div>
+
+                <button type="submit" class="btn btn-crimson btn-lg btn-block mt-4">
+                    Login as Administrator
+                </button>
+
+            </form>
+
+            <div style="margin-top:18px; text-align:center; font-size:0.85rem; color:var(--text-mid);">
                 Not an admin?
                 <a href="/login" class="auth-link">Back to user login</a>
-            </p>
-        </div>
+            </div>
 
+            <div class="admin-warning">
+                <span style="flex-shrink:0;">⚠️</span>
+                Unauthorized access is strictly prohibited and may be subject to legal action under Nepal law.
+            </div>
+
+        </div>
     </div>
+
 </div>
 
 </body>

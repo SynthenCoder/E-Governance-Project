@@ -6,6 +6,100 @@
     <title>Admin Panel · Nepal E-Governance</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Admin-specific sidebar accent */
+        .sidebar-admin-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 9px;
+            background: var(--crimson-muted);
+            border: 1px solid var(--crimson-border);
+            border-radius: var(--radius-full);
+            font-size: 0.6rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            color: var(--crimson-text);
+            text-transform: uppercase;
+            margin-left: auto;
+        }
+
+        /* Stats override colors per card */
+        .stat-card.stat-blue::after  { background: radial-gradient(circle, hsl(212 90% 60% / 0.08), transparent 70%); }
+        .stat-card.stat-total::after { background: radial-gradient(circle, hsl(212 90% 60% / 0.07), transparent 70%); }
+
+        /* Filter button row */
+        .filter-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-label {
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-right: 4px;
+        }
+
+        /* Card section header */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .section-header-title {
+            font-family: 'Cormorant', serif;
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: var(--text-high);
+            letter-spacing: -0.015em;
+        }
+
+        .section-header-count {
+            font-size: 0.75rem;
+            color: var(--text-low);
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-full);
+            padding: 3px 10px;
+        }
+
+        /* Chart card */
+        .chart-container {
+            position: relative;
+            height: 160px;
+        }
+
+        /* Username cell style */
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--blue-glow);
+            border: 1px solid hsl(212 90% 60% / 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: hsl(212 90% 75%);
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+    </style>
 </head>
 <body>
 
@@ -21,9 +115,10 @@
             </div>
         </div>
 
-        <span class="sidebar-label">Main</span>
+        <span class="sidebar-label">Administration</span>
         <a href="/admin" class="sidebar-link active">
             <span class="sidebar-link-icon">▦</span> Dashboard
+            <span class="sidebar-admin-badge">Admin</span>
         </a>
 
         <div class="sidebar-spacer"></div>
@@ -39,35 +134,30 @@
         <div class="page-header animate-in">
             <p class="page-eyebrow">Administration</p>
             <h1 class="page-title">🏛️ Government Admin Dashboard</h1>
-            <p class="page-subtitle">Manage users and applications</p>
+            <p class="page-subtitle">Review applications, manage users, and monitor portal activity</p>
         </div>
 
         <!-- FLASH -->
         {% with messages = get_flashed_messages() %}
         {% if messages %}
-        <div class="card animate-in" style="margin-bottom:16px; padding:14px 16px;">
-            <p style="color:var(--green-text); font-weight:500;">{{ messages[0] }}</p>
-        </div>
+        <div class="flash-success animate-in" style="margin-bottom:20px;">{{ messages[0] }}</div>
         {% endif %}
         {% endwith %}
 
         <!-- STATS -->
-        <div class="grid-4 mb-6">
+        <div class="grid-4 mb-6 animate-in stagger-1">
             <div class="stat-card">
                 <div class="stat-label">Total Users</div>
                 <div class="stat-value">{{ total_users }}</div>
             </div>
-
             <div class="stat-card">
                 <div class="stat-label">Total Applications</div>
                 <div class="stat-value">{{ total_apps }}</div>
             </div>
-
             <div class="stat-card">
-                <div class="stat-label">Pending</div>
+                <div class="stat-label">Pending Review</div>
                 <div class="stat-value" style="color:var(--amber-text);">{{ pending }}</div>
             </div>
-
             <div class="stat-card">
                 <div class="stat-label">Approved</div>
                 <div class="stat-value" style="color:var(--green-text);">{{ approved }}</div>
@@ -75,14 +165,18 @@
         </div>
 
         <!-- CHART -->
-        <div class="card mb-6 animate-in">
-            <div class="card-title" style="margin-bottom:16px;">Applications Overview</div>
-            <canvas id="chart" height="110"></canvas>
+        <div class="card mb-6 animate-in stagger-2">
+            <div class="section-header">
+                <div class="section-header-title">Applications Overview</div>
+                <span class="section-header-count">{{ total_apps }} total</span>
+            </div>
+            <div class="chart-container">
+                <canvas id="chart"></canvas>
+            </div>
         </div>
 
         <script>
         const ctx = document.getElementById('chart');
-
         new Chart(ctx, {
             type: 'bar',
             data: {
@@ -91,54 +185,66 @@
                     label: 'Applications',
                     data: [{{ pending }}, {{ approved }}, {{ rejected }}],
                     backgroundColor: [
-                        'rgba(245, 158, 11, 0.7)',
-                        'rgba(34, 197, 94, 0.7)',
-                        'rgba(239, 68, 68, 0.7)'
+                        'hsl(36 90% 43% / 0.65)',
+                        'hsl(142 71% 40% / 0.65)',
+                        'hsl(0 74% 42% / 0.65)'
                     ],
-                    borderRadius: 6
+                    borderColor: [
+                        'hsl(36 96% 58%)',
+                        'hsl(142 70% 65%)',
+                        'hsl(0 90% 70%)'
+                    ],
+                    borderWidth: 1,
+                    borderRadius: 8,
+                    borderSkipped: false
                 }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
-                    legend: {
-                        labels: {
-                            color: '#94a3b8'
-                        }
-                    }
+                    legend: { display: false }
                 },
                 scales: {
                     x: {
-                        ticks: { color: '#94a3b8' },
-                        grid: { color: 'rgba(148,163,184,0.08)' }
+                        ticks: { color: '#64748b', font: { family: 'Outfit', size: 12 } },
+                        grid: { color: 'rgba(148,163,184,0.06)' },
+                        border: { display: false }
                     },
                     y: {
-                        ticks: { color: '#94a3b8' },
-                        grid: { color: 'rgba(148,163,184,0.08)' }
+                        ticks: { color: '#64748b', font: { family: 'Outfit', size: 12 }, stepSize: 1 },
+                        grid: { color: 'rgba(148,163,184,0.06)' },
+                        border: { display: false }
                     }
                 }
             }
         });
         </script>
 
-        <!-- APPLICATIONS -->
-        <div class="card mb-6 animate-in">
+        <!-- APPLICATIONS TABLE -->
+        <div class="card mb-6 animate-in stagger-3">
 
-            <div style="margin-bottom:20px; display:flex; gap:10px;">
+            <div class="section-header">
+                <div class="section-header-title">Applications</div>
+            </div>
+
+            <div class="filter-row">
+                <span class="filter-label">Filter:</span>
                 <a href="/admin?filter=pending"
-                   class="btn {{ 'btn-primary' if filter_status=='pending' else 'btn-ghost' }}">
-                    Pending
+                   class="btn {{ 'btn-ghost' if filter_status != 'pending' else 'btn-primary' }} btn-sm">
+                    ⏳ Pending
                 </a>
-
                 <a href="/admin?filter=approved"
-                   class="btn {{ 'btn-success' if filter_status=='approved' else 'btn-ghost' }}">
-                    Approved
+                   class="btn {{ 'btn-ghost' if filter_status != 'approved' else 'btn-success' }} btn-sm">
+                    ✅ Approved
                 </a>
-
                 <a href="/admin?filter=rejected"
-                   class="btn {{ 'btn-danger' if filter_status=='rejected' else 'btn-ghost' }}">
-                    Rejected
+                   class="btn {{ 'btn-ghost' if filter_status != 'rejected' else 'btn-danger' }} btn-sm">
+                    ❌ Rejected
                 </a>
+                {% if filter_status %}
+                <a href="/admin" class="btn btn-ghost btn-sm" style="margin-left:4px; opacity:0.6;">Clear</a>
+                {% endif %}
             </div>
 
             {% if applications %}
@@ -147,20 +253,23 @@
                     <tr>
                         <th>ID</th>
                         <th>User</th>
-                        <th>Name</th>
+                        <th>Full Name</th>
                         <th>Status</th>
                         <th>Document</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
-
                 <tbody>
                     {% for app in applications %}
                     <tr>
-                        <td>#{{ app.id }}</td>
-                        <td>{{ app.username }}</td>
-                        <td>{{ app.full_name }}</td>
-
+                        <td style="font-family:monospace; font-size:0.76rem; color:var(--text-muted);">#{{ app.id }}</td>
+                        <td>
+                            <div class="user-cell">
+                                <div class="user-avatar">{{ app.username[0] }}</div>
+                                {{ app.username }}
+                            </div>
+                        </td>
+                        <td style="font-weight:500; color:var(--text-high);">{{ app.full_name }}</td>
                         <td>
                             {% if app.status == 'Pending' %}
                                 <span class="badge badge-pending">Pending</span>
@@ -170,30 +279,25 @@
                                 <span class="badge badge-rejected">Rejected</span>
                             {% endif %}
                         </td>
-
                         <td>
                             {% if app.file %}
-                                <a href="/uploads/{{ app.file }}" target="_blank" class="btn btn-ghost btn-sm">
-                                    📄 View PDF
-                                </a>
+                                <a href="/uploads/{{ app.file }}" target="_blank" class="btn btn-ghost btn-sm">📄 View PDF</a>
                             {% else %}
-                                <span style="opacity:.5;">No file</span>
+                                <span style="opacity:.4; font-size:0.78rem;">No file</span>
                             {% endif %}
                         </td>
-
                         <td>
                             {% if app.status == 'Pending' %}
                             <div class="flex gap-2">
                                 <form action="/approve/{{ app.id }}" method="POST">
-                                    <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                    <button type="submit" class="btn btn-success btn-sm">✓ Approve</button>
                                 </form>
-
                                 <form action="/reject/{{ app.id }}" method="POST">
-                                    <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                    <button type="submit" class="btn btn-danger btn-sm">✗ Reject</button>
                                 </form>
                             </div>
                             {% else %}
-                            <span style="opacity:.6;">Done</span>
+                            <span style="opacity:.4; font-size:0.78rem;">Completed</span>
                             {% endif %}
                         </td>
                     </tr>
@@ -202,14 +306,18 @@
             </table>
             {% else %}
             <div class="empty-state">
-                <p>No applications</p>
+                <div class="empty-state-icon">◎</div>
+                <p class="empty-state-text">No applications found for this filter.</p>
             </div>
             {% endif %}
         </div>
 
-        <!-- USERS -->
-        <div class="card animate-in">
-            <div class="card-title">Users</div>
+        <!-- USERS TABLE -->
+        <div class="card animate-in stagger-4">
+            <div class="section-header">
+                <div class="section-header-title">Registered Users</div>
+                <span class="section-header-count">{{ total_users }} total</span>
+            </div>
 
             {% if users %}
             <table class="data-table">
@@ -221,22 +329,36 @@
                         <th>Action</th>
                     </tr>
                 </thead>
-
                 <tbody>
                     {% for user in users %}
                     <tr>
-                        <td>#{{ user.id }}</td>
-                        <td>{{ user.username }}</td>
-                        <td>{{ user.role }}</td>
+                        <td style="font-family:monospace; font-size:0.76rem; color:var(--text-muted);">#{{ user.id }}</td>
+                        <td>
+                            <div class="user-cell">
+                                <div class="user-avatar" style="{{ 'background:var(--crimson-muted); border-color:var(--crimson-border); color:var(--crimson-text);' if user.role == 'admin' else '' }}">
+                                    {{ user.username[0] }}
+                                </div>
+                                {{ user.username }}
+                            </div>
+                        </td>
+                        <td>
+                            {% if user.role == 'admin' %}
+                                <span class="badge" style="background:var(--crimson-muted); color:var(--crimson-text); border:1px solid var(--crimson-border);">👑 Admin</span>
+                            {% else %}
+                                <span style="font-size:0.8rem; color:var(--text-low);">User</span>
+                            {% endif %}
+                        </td>
                         <td>
                             {% if user.role != 'admin' %}
                             <form action="/delete-user/{{ user.id }}" method="POST">
-                                <button type="submit" onclick="return confirm('Delete this user?')" class="btn btn-danger btn-sm">
+                                <button type="submit"
+                                        onclick="return confirm('Delete this user?')"
+                                        class="btn btn-danger btn-sm">
                                     Delete
                                 </button>
                             </form>
                             {% else %}
-                            👑 Admin
+                            <span style="opacity:.4; font-size:0.78rem;">Protected</span>
                             {% endif %}
                         </td>
                     </tr>
@@ -245,7 +367,7 @@
             </table>
             {% else %}
             <div class="empty-state">
-                <p>No users found</p>
+                <p class="empty-state-text">No users found</p>
             </div>
             {% endif %}
         </div>

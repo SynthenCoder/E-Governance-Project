@@ -3,8 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nepal E-Governance Portal</title>
+    <title>Nepal E-Governance Portal — Official Digital Services</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* ── Hero stats strip ── */
+        .hero-stats {
+            display: flex;
+            gap: 0;
+            margin-top: 72px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            background: var(--bg-surface);
+            animation: fadeUp var(--duration-enter) 400ms var(--ease-out-expo) both;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-stat-item {
+            flex: 1;
+            padding: 20px 28px;
+            border-right: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .hero-stat-item:last-child { border-right: none; }
+
+        .hero-stat-num {
+            font-family: 'Cormorant', serif;
+            font-size: 1.9rem;
+            font-weight: 500;
+            color: var(--text-high);
+            letter-spacing: -0.03em;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .hero-stat-label {
+            font-size: 0.68rem;
+            color: var(--text-low);
+            font-weight: 400;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        /* ── Feature grid ── */
+        .feature-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px 28px;
+            transition: border-color var(--transition), transform var(--duration-slow) var(--ease-out-expo), box-shadow var(--duration-slow) var(--ease-out-expo);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--blue), transparent);
+            opacity: 0;
+            transition: opacity var(--transition);
+        }
+
+        .feature-card:hover {
+            border-color: var(--border-em);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .feature-card:hover::before { opacity: 1; }
+
+        .feature-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--blue-subtle);
+            border: 1px solid hsl(212 90% 60% / 0.15);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            margin-bottom: 18px;
+        }
+
+        .feature-title {
+            font-family: 'Cormorant', serif;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-high);
+            letter-spacing: -0.015em;
+            margin-bottom: 8px;
+        }
+
+        .feature-desc {
+            font-size: 0.83rem;
+            color: var(--text-low);
+            font-weight: 300;
+            line-height: 1.7;
+        }
+
+        /* ── Trust section ── */
+        .trust-section {
+            background: var(--bg-surface);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 80px 24px;
+        }
+
+        .trust-item {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px 24px;
+        }
+
+        .trust-icon {
+            font-size: 1.5rem;
+            margin-bottom: 14px;
+            filter: drop-shadow(0 2px 8px hsl(348 83% 47% / 0.25));
+        }
+
+        .trust-title {
+            font-family: 'Cormorant', serif;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-high);
+            margin-bottom: 6px;
+            letter-spacing: -0.01em;
+        }
+
+        .trust-desc {
+            font-size: 0.81rem;
+            color: var(--text-low);
+            font-weight: 300;
+            line-height: 1.65;
+        }
+
+        /* ── Footer ── */
+        .site-footer {
+            border-top: 1px solid var(--border);
+            background: var(--bg-surface);
+            padding: 40px 24px 32px;
+        }
+
+        .footer-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-brand-name {
+            font-family: 'Cormorant', serif;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-high);
+            letter-spacing: -0.01em;
+        }
+
+        .footer-meta {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            text-align: right;
+        }
+
+        /* ── Mountain silhouette decoration ── */
+        .mountain-deco {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 120px;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.04;
+        }
+
+        @media (max-width: 768px) {
+            .hero-stats { display: none; }
+            .footer-inner { flex-direction: column; text-align: center; }
+            .footer-meta { text-align: center; }
+        }
+
+        @media (max-width: 640px) {
+            .feature-card { padding: 24px 20px; }
+        }
+    </style>
 </head>
 <body>
 
@@ -15,6 +211,7 @@
         <span class="topnav-name">Government of Nepal · E-Governance</span>
     </div>
     <div class="topnav-actions">
+        <span class="nav-badge">Official</span>
         <a href="/login" class="btn btn-ghost">Sign in</a>
         <a href="/register" class="btn btn-primary">Register</a>
     </div>
@@ -22,11 +219,17 @@
 
 <!-- HERO -->
 <section class="hero">
+
+    <!-- Mountain silhouette -->
+    <svg class="mountain-deco" viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,120 L0,80 L120,40 L240,70 L360,20 L480,55 L600,10 L720,45 L840,15 L960,50 L1080,25 L1200,60 L1320,35 L1440,65 L1440,120 Z" fill="currentColor"/>
+    </svg>
+
     <p class="hero-eyebrow">Official Digital Services Portal</p>
 
     <h1 class="hero-title">
         🇳🇵 Government Services<br>
-        Now Fully Online
+        <em>Now Fully Online</em>
     </h1>
 
     <p class="hero-subtitle">
@@ -36,84 +239,126 @@
 
     <div class="hero-actions">
         <a href="/register" class="btn btn-primary btn-lg">Create Account</a>
-        <a href="/login" class="btn btn-ghost btn-lg">Sign In</a>
+        <a href="/login" class="btn btn-ghost btn-lg">Sign In →</a>
     </div>
 
     <div class="hero-pillars">
-        <div class="pillar">⚡ Fast Processing</div>
-        <div class="pillar">🔍 Transparent System</div>
-        <div class="pillar">🔐 Secure & Official</div>
+        <div class="pillar"><span class="pillar-dot"></span> Fast Processing</div>
+        <div class="pillar"><span class="pillar-dot"></span> Transparent System</div>
+        <div class="pillar"><span class="pillar-dot"></span> Secure &amp; Official</div>
+    </div>
+
+    <!-- Stats Strip -->
+    <div class="hero-stats" style="max-width:560px;">
+        <div class="hero-stat-item">
+            <div class="hero-stat-num">24/7</div>
+            <div class="hero-stat-label">Available</div>
+        </div>
+        <div class="hero-stat-item">
+            <div class="hero-stat-num">100%</div>
+            <div class="hero-stat-label">Digital</div>
+        </div>
+        <div class="hero-stat-item">
+            <div class="hero-stat-num">SSL</div>
+            <div class="hero-stat-label">Encrypted</div>
+        </div>
+        <div class="hero-stat-item">
+            <div class="hero-stat-num">Free</div>
+            <div class="hero-stat-label">For Citizens</div>
+        </div>
+    </div>
+
+</section>
+
+<!-- SERVICES SECTION -->
+<section class="section" style="background:var(--bg-base);">
+    <div style="max-width:1100px; margin:0 auto;">
+        <div style="text-align:center; margin-bottom:56px;">
+            <p class="hero-eyebrow" style="justify-content:center; margin-bottom:12px;">Digital Services</p>
+            <h2 class="section-title" style="margin-bottom:0;">Available Services</h2>
+            <p style="font-size:0.88rem; color:var(--text-low); font-weight:300; margin-top:10px;">
+                Everything you need to interact with government — no queues, no delays.
+            </p>
+        </div>
+
+        <div class="grid-3 animate-in">
+
+            <div class="feature-card stagger-1">
+                <div class="feature-icon">📄</div>
+                <p class="feature-title">Submit Application</p>
+                <p class="feature-desc">
+                    Apply for government services quickly through our streamlined online system. Upload your documents securely.
+                </p>
+            </div>
+
+            <div class="feature-card stagger-2">
+                <div class="feature-icon">📊</div>
+                <p class="feature-title">Track Status</p>
+                <p class="feature-desc">
+                    Monitor your application status in real time with instant notifications at every stage.
+                </p>
+            </div>
+
+            <div class="feature-card stagger-3">
+                <div class="feature-icon">📬</div>
+                <p class="feature-title">Receive Decisions</p>
+                <p class="feature-desc">
+                    Get official approval or rejection notifications instantly — no waiting in line.
+                </p>
+            </div>
+
+        </div>
     </div>
 </section>
 
-<!-- SERVICES -->
-<section class="section">
-    <h2 class="section-title">Available Services</h2>
-
-    <div class="grid-3">
-
-        <div class="card">
-            <div style="font-size:1.6rem;">📄</div>
-            <p class="card-title">Submit Application</p>
-            <p class="card-desc">
-                Apply for government services quickly through our online system.
-            </p>
+<!-- TRUST SECTION -->
+<div class="trust-section">
+    <div style="max-width:1100px; margin:0 auto;">
+        <div style="text-align:center; margin-bottom:48px;">
+            <p class="hero-eyebrow" style="justify-content:center; margin-bottom:12px;">Why Use This Portal</p>
+            <h2 class="section-title" style="margin-bottom:0;">Built for Every Citizen</h2>
         </div>
 
-        <div class="card">
-            <div style="font-size:1.6rem;">📊</div>
-            <p class="card-title">Track Status</p>
-            <p class="card-desc">
-                Monitor your application status in real time.
-            </p>
-        </div>
+        <div class="grid-3 animate-in">
 
-        <div class="card">
-            <div style="font-size:1.6rem;">📬</div>
-            <p class="card-title">Receive Decisions</p>
-            <p class="card-desc">
-                Get approval or rejection notifications instantly via email.
-            </p>
-        </div>
+            <div class="trust-item stagger-1">
+                <div class="trust-icon">🏛️</div>
+                <p class="trust-title">Official Platform</p>
+                <p class="trust-desc">Part of Nepal's digital transformation initiative, operated under government mandate.</p>
+            </div>
 
+            <div class="trust-item stagger-2">
+                <div class="trust-icon">🔐</div>
+                <p class="trust-title">Secure by Design</p>
+                <p class="trust-desc">End-to-end encryption and strict data handling policies protect your personal information.</p>
+            </div>
+
+            <div class="trust-item stagger-3">
+                <div class="trust-icon">⚡</div>
+                <p class="trust-title">Saves Your Time</p>
+                <p class="trust-desc">Avoid hours of travel and long queues. Process everything from home in minutes.</p>
+            </div>
+
+        </div>
     </div>
-</section>
-
-<!-- TRUST -->
-<section class="section" style="background:var(--card-bg);">
-    <h2 class="section-title">Why Use This Portal?</h2>
-
-    <div class="grid-3">
-
-        <div class="card">
-            <p class="card-title">Official Platform</p>
-            <p class="card-desc">
-                Developed as part of Nepal's digital transformation initiative.
-            </p>
-        </div>
-
-        <div class="card">
-            <p class="card-title">Secure System</p>
-            <p class="card-desc">
-                Your data is protected and handled under strict policies.
-            </p>
-        </div>
-
-        <div class="card">
-            <p class="card-title">Time Efficient</p>
-            <p class="card-desc">
-                Avoid long queues and process everything online.
-            </p>
-        </div>
-
-    </div>
-</section>
+</div>
 
 <!-- FOOTER -->
-<footer style="padding:20px;text-align:center;font-size:.85rem;color:var(--text-mid);">
-    © 2026 Government of Nepal · E-Governance Portal  
-    <br>
-    All rights reserved.
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <span style="font-size:1.3rem; filter:drop-shadow(0 2px 6px hsl(348 83% 47% / 0.3));">🇳🇵</span>
+            <div>
+                <div class="footer-brand-name">Government of Nepal</div>
+                <div style="font-size:0.65rem; color:var(--text-muted); letter-spacing:0.06em; text-transform:uppercase;">E-Governance Portal</div>
+            </div>
+        </div>
+
+        <div class="footer-meta">
+            © 2026 Government of Nepal · All rights reserved<br>
+            <span style="color:var(--text-muted);">This is an official government platform.</span>
+        </div>
+    </div>
 </footer>
 
 </body>

@@ -5,6 +5,133 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard · Nepal E-Governance</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Welcome banner */
+        .welcome-banner {
+            background: linear-gradient(135deg,
+                hsl(222 62% 9%) 0%,
+                hsl(222 62% 10%) 50%,
+                hsl(222 58% 9%) 100%);
+            border: 1px solid var(--border-em);
+            border-radius: var(--radius-xl);
+            padding: 32px 36px;
+            margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-banner::before {
+            content: '';
+            position: absolute;
+            top: -30px; right: -30px;
+            width: 180px; height: 180px;
+            background: radial-gradient(circle, hsl(212 90% 60% / 0.08), transparent 70%);
+            pointer-events: none;
+        }
+
+        .welcome-banner::after {
+            content: '';
+            position: absolute;
+            bottom: -20px; left: 40%;
+            width: 140px; height: 140px;
+            background: radial-gradient(circle, hsl(348 83% 47% / 0.05), transparent 70%);
+            pointer-events: none;
+        }
+
+        .welcome-greeting {
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--blue);
+            margin-bottom: 8px;
+        }
+
+        .welcome-name {
+            font-family: 'Cormorant', serif;
+            font-size: 1.8rem;
+            font-weight: 500;
+            color: var(--text-high);
+            letter-spacing: -0.025em;
+            margin-bottom: 8px;
+        }
+
+        .welcome-sub {
+            font-size: 0.84rem;
+            color: var(--text-low);
+            font-weight: 300;
+        }
+
+        /* Quick action cards */
+        .action-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: border-color var(--transition), transform var(--duration-slow) var(--ease-out-expo), box-shadow var(--duration-slow) var(--ease-out-expo);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .action-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            opacity: 0;
+            transition: opacity var(--transition);
+        }
+
+        .action-card.primary::before { background: linear-gradient(90deg, transparent, var(--blue), transparent); }
+        .action-card.ghost::before   { background: linear-gradient(90deg, transparent, var(--border-em), transparent); }
+
+        .action-card:hover {
+            border-color: var(--border-em);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+        .action-card:hover::before { opacity: 1; }
+
+        .action-icon {
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+
+        .action-title {
+            font-family: 'Cormorant', serif;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-high);
+            letter-spacing: -0.015em;
+        }
+
+        .action-desc {
+            font-size: 0.81rem;
+            color: var(--text-low);
+            font-weight: 300;
+            line-height: 1.65;
+            flex: 1;
+        }
+
+        /* Summary card */
+        .summary-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            font-size: 0.74rem;
+            font-weight: 500;
+        }
+
+        .summary-pill.pending  { background: var(--amber-muted); color: var(--amber-text); border: 1px solid hsl(36 90% 43% / 0.2); }
+        .summary-pill.approved { background: var(--green-muted); color: var(--green-text); border: 1px solid hsl(142 71% 40% / 0.2); }
+        .summary-pill.rejected { background: var(--red-muted); color: var(--red-text); border: 1px solid hsl(0 74% 42% / 0.2); }
+    </style>
 </head>
 <body>
 
@@ -45,15 +172,15 @@
     <!-- MAIN -->
     <main class="main">
 
-        <!-- HEADER -->
-        <div class="page-header animate-in">
-            <p class="page-eyebrow">User Portal</p>
-            <h1 class="page-title">🏛️ Welcome, {{ session['user'] }}</h1>
-            <p class="page-subtitle">Manage your government services easily</p>
+        <!-- WELCOME BANNER -->
+        <div class="welcome-banner animate-in">
+            <p class="welcome-greeting">User Portal</p>
+            <h1 class="welcome-name">Welcome back, {{ session['user'] }} 👋</h1>
+            <p class="welcome-sub">Here's an overview of your government service applications.</p>
         </div>
 
         <!-- STATS -->
-        <div class="grid-4 mb-8">
+        <div class="grid-4 mb-6 stagger-1">
 
             <div class="stat-card">
                 <p class="stat-label">Total Applications</p>
@@ -63,7 +190,7 @@
             </div>
 
             <div class="stat-card">
-                <p class="stat-label">Pending</p>
+                <p class="stat-label">Pending Review</p>
                 <p class="stat-value" style="color:var(--amber-text);">
                     {{ applications|selectattr('status','equalto','Pending')|list|length if applications else 0 }}
                 </p>
@@ -85,33 +212,39 @@
 
         </div>
 
-        <!-- SUMMARY -->
-        <div class="card mb-6">
-            <p style="font-size:.9rem; color:var(--text-mid);">
-                📊 Status Summary:
-                {{ applications|selectattr('status','equalto','Pending')|list|length if applications else 0 }} pending ·
-                {{ applications|selectattr('status','equalto','Approved')|list|length if applications else 0 }} approved ·
-                {{ applications|selectattr('status','equalto','Rejected')|list|length if applications else 0 }} rejected
-            </p>
+        <!-- SUMMARY BAR -->
+        {% if applications %}
+        <div class="card mb-6 stagger-2" style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; padding:18px 24px;">
+            <span style="font-size:0.8rem; color:var(--text-low); font-weight:400;">Status Overview:</span>
+            <span class="summary-pill pending">
+                ⏳ {{ applications|selectattr('status','equalto','Pending')|list|length }} Pending
+            </span>
+            <span class="summary-pill approved">
+                ✅ {{ applications|selectattr('status','equalto','Approved')|list|length }} Approved
+            </span>
+            <span class="summary-pill rejected">
+                ❌ {{ applications|selectattr('status','equalto','Rejected')|list|length }} Rejected
+            </span>
         </div>
+        {% endif %}
 
-        <!-- ACTIONS -->
-        <div class="grid-2">
+        <!-- QUICK ACTIONS -->
+        <div class="grid-2 stagger-3">
 
-            <div class="card card-hover">
-                <div style="font-size:1.4rem;margin-bottom:14px;">✎</div>
-                <p class="card-title">Apply for Service</p>
-                <p class="card-desc">
-                    Submit a new application for government services.
+            <div class="action-card primary">
+                <div class="action-icon">✎</div>
+                <p class="action-title">Apply for Service</p>
+                <p class="action-desc">
+                    Submit a new application for government services. Upload your citizenship document and get a decision.
                 </p>
                 <a href="/apply" class="btn btn-primary">Apply Now</a>
             </div>
 
-            <div class="card card-hover">
-                <div style="font-size:1.4rem;margin-bottom:14px;">◎</div>
-                <p class="card-title">Check Status</p>
-                <p class="card-desc">
-                    Track progress of your submitted applications.
+            <div class="action-card ghost">
+                <div class="action-icon">◎</div>
+                <p class="action-title">Check Application Status</p>
+                <p class="action-desc">
+                    Track the progress of all your submitted applications in real time.
                 </p>
                 <a href="/status" class="btn btn-ghost">View Status</a>
             </div>
@@ -120,10 +253,15 @@
 
         <!-- EMPTY STATE -->
         {% if not applications %}
-        <div class="card mt-6">
-            <p style="text-align:center; color:var(--text-mid);">
-                You have not submitted any applications yet.
-            </p>
+        <div class="card mt-6 animate-in">
+            <div class="empty-state">
+                <div class="empty-state-icon">📭</div>
+                <p class="empty-state-text">
+                    You haven't submitted any applications yet.<br>
+                    Get started with your first service request.
+                </p>
+                <a href="/apply" class="btn btn-primary mt-4">Apply Now</a>
+            </div>
         </div>
         {% endif %}
 

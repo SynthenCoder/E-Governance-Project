@@ -5,6 +5,130 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Applications · Nepal E-Governance</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Application status card */
+        .app-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 22px 26px;
+            transition: border-color var(--transition), box-shadow var(--duration-slow) var(--ease-out-expo);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-card:hover {
+            border-color: var(--border-em);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Left color accent bar per status */
+        .app-card::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 16px; bottom: 16px;
+            width: 3px;
+            border-radius: 0 var(--radius-full) var(--radius-full) 0;
+        }
+
+        .app-card.status-pending::before  { background: var(--amber-text); box-shadow: 0 0 10px hsl(36 96% 58% / 0.35); }
+        .app-card.status-approved::before { background: var(--green-text);  box-shadow: 0 0 10px hsl(142 70% 65% / 0.35); }
+        .app-card.status-rejected::before { background: var(--red-text);    box-shadow: 0 0 10px hsl(0 90% 70% / 0.35); }
+
+        /* App card layout */
+        .app-card-inner {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .app-id {
+            font-family: 'Outfit', monospace;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 0.04em;
+            margin-bottom: 5px;
+        }
+
+        .app-name {
+            font-weight: 500;
+            color: var(--text-high);
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+            letter-spacing: -0.01em;
+        }
+
+        .status-info {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .status-message {
+            font-size: 0.7rem;
+            margin-top: 5px;
+            font-weight: 400;
+        }
+
+        .status-message.pending  { color: var(--amber-text); }
+        .status-message.approved { color: var(--green-text); }
+        .status-message.rejected { color: var(--red-text); }
+
+        /* Step progress indicator */
+        .progress-strip {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            margin-top: 18px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex: 1;
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .progress-step.active { color: var(--text-mid); }
+        .progress-step.done   { color: var(--green-text); }
+        .progress-step.fail   { color: var(--red-text); }
+
+        .progress-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--border-em);
+            flex-shrink: 0;
+            transition: background var(--transition);
+        }
+
+        .progress-step.active .progress-dot { background: var(--amber-text); animation: badge-pulse 2s ease-in-out infinite; }
+        .progress-step.done .progress-dot   { background: var(--green-text); }
+        .progress-step.fail .progress-dot   { background: var(--red-text); }
+
+        .progress-connector {
+            flex: 0 0 24px;
+            height: 1px;
+            background: var(--border);
+            margin: 0 4px;
+        }
+
+        @keyframes badge-pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50%       { opacity: 0.5; transform: scale(1.6); }
+        }
+
+        @media (max-width: 580px) {
+            .app-card-inner { flex-direction: column; }
+            .status-info { text-align: left; }
+            .progress-strip { display: none; }
+        }
+    </style>
 </head>
 <body>
 
@@ -59,55 +183,62 @@
         </div>
 
         {% if applications %}
-        <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex; flex-direction:column; gap:12px;">
 
             {% for app in applications %}
-            <div class="card" style="padding:20px 24px;">
+            <div class="app-card status-{{ app['status']|lower }} animate-in" style="animation-delay:{{ loop.index0 * 60 }}ms;">
 
-                <div class="flex-between">
+                <div class="app-card-inner">
 
                     <!-- LEFT -->
                     <div>
-                        <p style="font-weight:500;color:var(--text-high);margin-bottom:4px;">
-                            {{ app['full_name'] }}
-                        </p>
-                        <p style="font-size:.78rem;color:var(--text-low);">
-                            Application #{{ app['id'] }}
-                        </p>
+                        <p class="app-id">Application #{{ app['id'] }}</p>
+                        <p class="app-name">{{ app['full_name'] }}</p>
 
-                        <!-- FILE VIEW -->
                         {% if app.file %}
-                        <a href="/uploads/{{ app.file }}" target="_blank"
-                           class="btn btn-ghost btn-sm mt-2">
+                        <a href="/uploads/{{ app.file }}" target="_blank" class="btn btn-ghost btn-sm">
                             📄 View Document
                         </a>
                         {% endif %}
                     </div>
 
                     <!-- RIGHT STATUS -->
-                    <div style="text-align:right;">
-
+                    <div class="status-info">
                         {% if app['status'] == 'Pending' %}
                             <span class="badge badge-pending">⏳ Pending</span>
-                            <p style="font-size:.7rem;color:var(--amber-text);margin-top:4px;">
-                                Waiting for review
-                            </p>
-
+                            <p class="status-message pending">Awaiting review</p>
                         {% elif app['status'] == 'Approved' %}
                             <span class="badge badge-approved">✅ Approved</span>
-                            <p style="font-size:.7rem;color:var(--green-text);margin-top:4px;">
-                                Successfully approved
-                            </p>
-
+                            <p class="status-message approved">Successfully approved</p>
                         {% else %}
                             <span class="badge badge-rejected">❌ Rejected</span>
-                            <p style="font-size:.7rem;color:var(--red-text);margin-top:4px;">
-                                Application rejected
-                            </p>
+                            <p class="status-message rejected">Application rejected</p>
                         {% endif %}
-
                     </div>
 
+                </div>
+
+                <!-- Progress strip -->
+                <div class="progress-strip">
+                    <div class="progress-step done">
+                        <div class="progress-dot"></div>
+                        Submitted
+                    </div>
+                    <div class="progress-connector"></div>
+                    <div class="progress-step done">
+                        <div class="progress-dot"></div>
+                        Received
+                    </div>
+                    <div class="progress-connector"></div>
+                    <div class="progress-step {% if app['status'] == 'Pending' %}active{% elif app['status'] == 'Approved' %}done{% else %}fail{% endif %}">
+                        <div class="progress-dot"></div>
+                        Under Review
+                    </div>
+                    <div class="progress-connector"></div>
+                    <div class="progress-step {% if app['status'] == 'Approved' %}done{% elif app['status'] == 'Rejected' %}fail{% endif %}">
+                        <div class="progress-dot"></div>
+                        {% if app['status'] == 'Approved' %}Approved{% elif app['status'] == 'Rejected' %}Rejected{% else %}Decision{% endif %}
+                    </div>
                 </div>
 
             </div>
@@ -116,7 +247,7 @@
         </div>
 
         <div class="mt-6">
-            <a href="/apply" class="btn btn-primary">Submit new application</a>
+            <a href="/apply" class="btn btn-primary">+ Submit New Application</a>
         </div>
 
         {% else %}
@@ -125,9 +256,9 @@
                 <div class="empty-state-icon">📭</div>
                 <p class="empty-state-text">
                     No applications yet.<br>
-                    Start by submitting your first request.
+                    Start by submitting your first service request.
                 </p>
-                <a href="/apply" class="btn btn-primary mt-4">Apply now</a>
+                <a href="/apply" class="btn btn-primary mt-4">Apply Now</a>
             </div>
         </div>
         {% endif %}
