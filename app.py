@@ -44,8 +44,8 @@ def allowed_file(filename):
 # EMAIL SYSTEM
 # =========================
 def send_email(to_email, subject, body):
-    sender_email = "sarthakbhattarai121@gmail.com"
-    sender_password = "wkyictsuriynniwk"
+    sender_email = os.environ.get("EMAIL_USER") 
+    sender_password = os.environ.get("EMAIL_PASS")
 
     msg = MIMEText(body)
     msg["Subject"] = subject
@@ -596,7 +596,9 @@ def delete_user(id):
 
 # =========================
 # RUN
-# =========================pip install gunicorn
+# =========================
+import os
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
