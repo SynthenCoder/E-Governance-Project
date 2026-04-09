@@ -1,26 +1,45 @@
-# 🇳🇵 Nepal E-Governance Portal
+# 🏛️ E-Governance Web Application System
 
-A full-stack web application that digitizes government service applications.
+## 📌 Overview
+A full-stack web application designed to digitize government services and streamline workflows through automation. This system simulates real-world e-governance processes with secure authentication and structured service handling.
 
-## 🔥 Features
-- User registration with OTP verification
-- Secure login system
-- Admin dashboard
-- File upload (PDF)
-- Application approval/rejection
-- Email notifications
+---
 
-## 🛠 Tech Stack
-- Python (Flask)
-- SQLite
-- HTML/CSS
-- SMTP (Email)
+## 🚀 Features
+- 🔐 OTP-based Email Authentication  
+- 👥 Role-Based Access Control (Admin/User)  
+- 📊 Interactive Dashboard  
+- 📁 Document Upload & Validation  
+- 🛡️ File Type Restrictions for Security  
+- 🔄 Structured Workflow System  
 
-## 🚀 Live Demo
-[Your Render Link]
+---
 
-## 📸 Screenshots
-(Add screenshots here)
+## 🛠️ Tech Stack
+- Python (Flask)  
+- HTML, CSS  
+- Database  
 
-## Open in browser:
-   https://nepal-egov-system.onrender.com
+---
+
+## 🌐 Live Demo
+👉 https://nepal-egov-system.onrender.com  
+
+---
+
+## 🎯 Key Highlights
+- Built a real-world system simulation for government services  
+- Focused on security, validation, and structured workflows  
+- Deployed on Render for live accessibility  
+
+---
+
+## 📷 Screenshots
+
+
+---
+
+## 📬 Author
+Sarthak Bhattarai  
+📧 sarthakbhattarai121@gmail.com  
+🔗 https://github.com/SynthenCoder
