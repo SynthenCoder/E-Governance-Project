@@ -44,8 +44,8 @@ def allowed_file(filename):
 # EMAIL SYSTEM
 # =========================
 def send_email(to_email, subject, body):
-    sender_email = os.environ.get("EMAIL_USER")
-    sender_password = os.environ.get("EMAIL_PASS")
+    sender_email = os.environ.get("sarthakbhattarai121@gmail.com")
+    sender_password = os.environ.get("xqknfswjshmqzbvl")
 
     if not sender_email or not sender_password:
         print("Missing email environment variables ❌")
