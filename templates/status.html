@@ -175,6 +175,11 @@
 
     <!-- MAIN -->
     <main class="main">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+        <div class="flash-{{ 'success' if category == 'success' else 'error' }}" style="margin-bottom:16px;">{{ message }}</div>
+        {% endfor %}
+        {% endwith %}
 
         <div class="page-header animate-in">
             <p class="page-eyebrow">Services</p>
@@ -213,6 +218,7 @@
                         {% else %}
                             <span class="badge badge-rejected">❌ Rejected</span>
                             <p class="status-message rejected">Application rejected</p>
+                            {% if app["reason"] %}<p class="status-message rejected" style="margin-top:4px;">Reason: {{ app["reason"] }}</p>{% endif %}
                         {% endif %}
                     </div>
 

@@ -1,3 +1,21 @@
+# secrets & local config
+.env
+.secret_key
+
+# runtime data
 database.db
+database.db-wal
+database.db-shm
 uploads/
+data/
+
+# python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# os / editor
 .DS_Store
+.idea/
+.vscode/

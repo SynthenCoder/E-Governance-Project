@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel · Nepal E-Governance</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='vendor/chart.umd.js') }}"></script>
     <style>
         /* Admin-specific sidebar accent */
         .sidebar-admin-badge {
@@ -138,10 +138,10 @@
         </div>
 
         <!-- FLASH -->
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        <div class="flash-success animate-in" style="margin-bottom:20px;">{{ messages[0] }}</div>
-        {% endif %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+        <div class="flash-{{ 'success' if category == 'success' else 'error' }}" style="margin-bottom:16px;">{{ message }}</div>
+        {% endfor %}
         {% endwith %}
 
         <!-- STATS -->
@@ -290,9 +290,14 @@
                             {% if app.status == 'Pending' %}
                             <div class="flex gap-2">
                                 <form action="/approve/{{ app.id }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button type="submit" class="btn btn-success btn-sm">✓ Approve</button>
                                 </form>
-                                <form action="/reject/{{ app.id }}" method="POST">
+                                <form action="/reject/{{ app.id }}" method="POST" style="display:flex; gap:6px; align-items:center;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="text" name="reason" class="form-input" maxlength="300" required
+                                           placeholder="Reason for rejection"
+                                           style="padding:6px 10px; font-size:0.78rem; min-width:150px;">
                                     <button type="submit" class="btn btn-danger btn-sm">✗ Reject</button>
                                 </form>
                             </div>
@@ -351,6 +356,7 @@
                         <td>
                             {% if user.role != 'admin' %}
                             <form action="/delete-user/{{ user.id }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button type="submit"
                                         onclick="return confirm('Delete this user?')"
                                         class="btn btn-danger btn-sm">

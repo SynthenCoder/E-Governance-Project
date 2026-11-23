@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} · Nepal E-Governance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;">
+    <div class="animate-in" style="width:100%; max-width:440px; text-align:center; padding:40px 32px; background:var(--bg-surface); border:1px solid var(--border-em); border-radius:16px;">
+        <div style="font-family:'Cormorant', serif; font-size:4rem; font-weight:500; color:var(--text-high); line-height:1;">{{ code }}</div>
+        <h1 style="margin:14px 0 8px; font-size:1.2rem; font-weight:500; color:var(--text-high);">{{ title }}</h1>
+        <p style="color:var(--text-mid); font-size:0.9rem; line-height:1.6; margin-bottom:28px;">{{ message }}</p>
+        <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+            <a href="/" class="btn btn-primary">← Home</a>
+            <a href="/login" class="btn btn-ghost">Log in</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

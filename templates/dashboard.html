@@ -171,6 +171,11 @@
 
     <!-- MAIN -->
     <main class="main">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+        <div class="flash-{{ 'success' if category == 'success' else 'error' }}" style="margin-bottom:16px;">{{ message }}</div>
+        {% endfor %}
+        {% endwith %}
 
         <!-- WELCOME BANNER -->
         <div class="welcome-banner animate-in">

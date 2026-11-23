@@ -112,14 +112,15 @@
         </div>
 
         <!-- FLASH MESSAGE -->
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        <div class="flash-error" style="margin-bottom:20px;">{{ messages[0] }}</div>
-        {% endif %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+        <div class="flash-{{ 'success' if category == 'success' else 'error' }}" style="margin-bottom:16px;">{{ message }}</div>
+        {% endfor %}
         {% endwith %}
 
         <!-- FORM with segmented OTP inputs -->
         <form method="POST" id="otp-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
             <div class="form-group" style="margin-bottom:8px;">
                 <label class="form-label" style="text-align:center; display:block;">Enter OTP</label>
@@ -146,10 +147,12 @@
 
         </form>
 
-        <p class="auth-footer" style="margin-top:14px;">
+        <form method="POST" action="/resend-otp" class="auth-footer" style="margin-top:14px; text-align:center;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             Didn't receive a code?
-            <a href="/register" class="auth-link">Try again</a>
-        </p>
+            <button type="submit" class="auth-link" style="background:none; border:none; cursor:pointer; font:inherit; padding:0;">Resend code</button>
+            &nbsp;·&nbsp; <a href="/register" class="auth-link">Start over</a>
+        </form>
 
     </div>
 </div>
