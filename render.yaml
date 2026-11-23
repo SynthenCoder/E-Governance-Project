@@ -16,6 +16,9 @@ services:
         sync: false
       - key: ADMIN_SETUP_CODE
         sync: false
+      # Free plan blocks SMTP, so email OTP cannot be delivered; uncomment to skip OTP:
+      # - key: REQUIRE_EMAIL_OTP
+      #   value: "false"
       # To keep data across deploys (paid plans), attach a disk mounted at /var/data
       # and uncomment:
       # - key: DATA_DIR

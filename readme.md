@@ -10,7 +10,7 @@ A full-stack Flask application that digitises a government service workflow: cit
 
 | Area | What it does |
 |---|---|
-| 🔐 Authentication | Email-OTP registration (6-digit code, 10-minute expiry, 5 attempts, resend cooldown), hashed passwords, separate admin login |
+| 🔐 Authentication | Email-OTP registration (6-digit code, 10-minute expiry, 5 attempts, resend cooldown; can be switched off with `REQUIRE_EMAIL_OTP=false`), hashed passwords, separate admin login |
 | 👥 Roles | Citizen and Administrator, enforced on every route against the database |
 | 📁 Documents | PDF-only uploads (5 MB max), validated by file signature, stored under random names |
 | 🛡️ Private files | A document can only be opened by the citizen who uploaded it and by an administrator |
@@ -61,6 +61,7 @@ If `ADMIN_SETUP_CODE` is empty, admin registration is disabled entirely.
 | `EMAIL_PASS` | For email | Gmail **App Password** (Google Account → Security → App passwords) |
 | `ADMIN_SETUP_CODE` | To create the admin | Secret code required at `/admin-register` |
 | `DATA_DIR` | Optional | Folder for `database.db` and `uploads/` (use a persistent disk in production) |
+| `REQUIRE_EMAIL_OTP` | Optional | `false` = register without an emailed code (default `true`) |
 | `DEV_PRINT_OTP` | Dev only | Print OTP codes to the log when email is not configured |
 | `SMTP_HOST` / `SMTP_PORT` | Optional | Defaults: `smtp.gmail.com` / `465` |
 | `COOKIE_SECURE`, `TRUST_PROXY` | Optional | Auto-enabled on Render; set manually for other HTTPS hosts / proxies |
@@ -74,6 +75,8 @@ If `ADMIN_SETUP_CODE` is empty, admin registration is disabled entirely.
 3. Add the environment variables above in the dashboard (`SECRET_KEY`, `EMAIL_USER`, `EMAIL_PASS`, `ADMIN_SETUP_CODE`).
 4. Health check path: `/healthz`.
 
+> **Email on Render's free plan:** free web services block outbound SMTP ports (25, 465, 587), so Gmail SMTP cannot work there. Either upgrade the service, send email through an HTTPS email API, or set `REQUIRE_EMAIL_OTP=false`.
+
 > **Data persistence:** SQLite and uploaded files live on the server's disk. On Render's free tier the disk is wiped on every deploy/restart. For real use, attach a persistent disk, set `DATA_DIR` to its mount path, or move to a hosted database.
 
 > **Why one worker?** Login/OTP rate limiting is kept in memory per process, so a single worker (with threads) keeps the limits accurate.
@@ -86,7 +89,7 @@ If `ADMIN_SETUP_CODE` is empty, admin registration is disabled entirely.
 python -m unittest discover -s tests -v
 ```
 
-45 end-to-end tests cover CSRF, OTP registration, login rate limiting, admin setup, upload validation, document access control, the review workflow, user deletion and database migration.
+48 end-to-end tests cover CSRF, OTP registration, login rate limiting, admin setup, upload validation, document access control, the review workflow, user deletion and database migration.
 
 ---
 

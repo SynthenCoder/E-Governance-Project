@@ -86,6 +86,9 @@ SMTP_PORT = int(os.environ.get("SMTP_PORT", "465"))
 ADMIN_SETUP_CODE = os.environ.get("ADMIN_SETUP_CODE", "")
 # Local development only: print OTP codes to the server log instead of emailing.
 DEV_PRINT_OTP = env_flag("DEV_PRINT_OTP")
+# Set REQUIRE_EMAIL_OTP=false to let people register without an emailed code
+# (useful while email sending is unavailable, e.g. Render's free plan blocks SMTP).
+REQUIRE_EMAIL_OTP = env_flag("REQUIRE_EMAIL_OTP", True)
 
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024  # 5 MB per PDF
 MAX_PENDING_PER_USER = 5
@@ -541,6 +544,19 @@ def register():
             if conn.execute("SELECT 1 FROM users WHERE email=? COLLATE NOCASE", (email,)).fetchone():
                 flash("Email already registered.", "error")
                 return redirect(url_for("register"))
+
+            if not REQUIRE_EMAIL_OTP:  # OTP switched off: create the account straight away
+                try:
+                    conn.execute(
+                        "INSERT INTO users (username, email, password, role, created_at) VALUES (?, ?, ?, 'user', ?)",
+                        (username, email, generate_password_hash(password), now_iso()),
+                    )
+                except sqlite3.IntegrityError:
+                    flash("Username or email already exists.", "error")
+                    return redirect(url_for("register"))
+                flash("Account created. You can now log in.", "success")
+                return redirect(url_for("login"))
+
             if conn.execute(
                 "SELECT 1 FROM pending_registrations WHERE username=? COLLATE NOCASE AND email<>? COLLATE NOCASE",
                 (username, email),

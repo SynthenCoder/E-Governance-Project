@@ -218,6 +218,46 @@ class TestRegistrationOtp(Base):
             self.assertEqual(c.execute("SELECT COUNT(*) FROM pending_registrations").fetchone()[0], 0)
 
 
+class TestRegistrationWithoutOtp(Base):
+    """REQUIRE_EMAIL_OTP=false: accounts are created immediately, no email involved."""
+
+    def setUp(self):
+        super().setUp()
+        self._orig_flag = egov.REQUIRE_EMAIL_OTP
+        egov.REQUIRE_EMAIL_OTP = False
+
+    def tearDown(self):
+        egov.REQUIRE_EMAIL_OTP = self._orig_flag
+        super().tearDown()
+
+    def register(self, **over):
+        data = dict(username="bob", email="bob@example.com", password=STRONG, confirm_password=STRONG)
+        data.update(over)
+        return self.post("/register", data)
+
+    def test_account_created_immediately_without_email(self):
+        r = self.register()
+        self.assertEqual(r.headers["Location"], "/login")
+        self.assertEqual(self.sent, [])
+        with egov.db() as c:
+            self.assertEqual(c.execute("SELECT COUNT(*) FROM pending_registrations").fetchone()[0], 0)
+            self.assertEqual(c.execute("SELECT role FROM users WHERE username='bob'").fetchone()["role"], "user")
+        self.assertEqual(self.login("bob").get("/dashboard").status_code, 200)
+
+    def test_validation_and_duplicates_still_enforced(self):
+        self.assertEqual(self.register(password="short", confirm_password="short").headers["Location"], "/register")
+        self.assertEqual(self.register(confirm_password="Different-9").headers["Location"], "/register")
+        self.register()
+        self.assertEqual(self.register(email="other@example.com").headers["Location"], "/register")  # same username
+        self.assertEqual(self.register(username="bob2").headers["Location"], "/register")  # same email
+        with egov.db() as c:
+            self.assertEqual(c.execute("SELECT COUNT(*) FROM users").fetchone()[0], 1)
+
+    def test_verify_page_not_reachable(self):
+        self.register()
+        self.assertEqual(self.client.get("/verify").headers["Location"], "/register")
+
+
 class TestLogin(Base):
     def test_success_and_failure_messages_are_generic(self):
         self.make_user()
